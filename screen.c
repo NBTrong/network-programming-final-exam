@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #define MAX_LEN 255
+#define SQUARE 3
 void loginScreen();
 void lobbyScreen();
 void readyScreen();
@@ -11,18 +12,22 @@ void rankingScreen();
 void challengeScreen();
 // void Screen();
 
-
-void loginScreen (){
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { /* Clear input buffer */ }
+}
+void loginScreen()
+{
     int menu;
     while (1)
     {
-        printf (" =================== Caro =================== \n");
-        printf (" 1. Login. \n");
-        printf (" 2. Register. \n");
-        printf (" 0. Exit program. \n");
-        printf (" ============================================ \n");
-        printf (" Enter your choice: ");
-        scanf("%d",&menu);
+        printf(" =================== Caro =================== \n");
+        printf(" 1. Login. \n");
+        printf(" 2. Register. \n");
+        printf(" 0. Exit program. \n");
+        printf(" ============================================ \n");
+        printf(" Enter your choice: ");
+        scanf("%d", &menu);
         system("clear");
         switch (menu)
         {
@@ -37,18 +42,19 @@ void loginScreen (){
             break;
         }
     }
-    
 }
-void registerScreen(){
+void registerScreen()
+{
     int menu;
-    char username[MAX_LEN],password[MAX_LEN];
+    char username[MAX_LEN], password[MAX_LEN];
     while (1)
     {
-        printf (" =================== Caro =================== \n");
-        printf (" 1. Enter your username:"); scanf("%s",username);
+        printf(" =================== Caro =================== \n");
+        printf(" 1. Enter your username:");
+        scanf("%s", username);
         // printf (" 2. Enter your password:");
-        printf (" Enter your choice: ");
-        scanf("%d",&menu);
+        printf(" Enter your choice: ");
+        scanf("%d", &menu);
         system("clear");
         switch (menu)
         {
@@ -64,21 +70,22 @@ void registerScreen(){
         }
     }
 }
-void lobbyScreen(){
+void lobbyScreen()
+{
     int menu;
     system("clear");
     while (1)
     {
-        printf (" =================== Caro =================== \n");
-        printf (" Hello username ! Welcome back !\n");
-        printf (" 1. Ready to game. \n");
-        printf (" 2. Ranking. \n");
-        printf (" 3. Chanllenge.\n");
-        printf (" 4. Log out. \n");
-        printf (" 0. Exit program. \n");
-        printf (" ============================================ \n");
-        printf (" Enter your choice: ");
-        scanf("%d",&menu);
+        printf(" =================== Caro =================== \n");
+        printf(" Hello username ! Welcome back !\n");
+        printf(" 1. Ready to game. \n");
+        printf(" 2. Ranking. \n");
+        printf(" 3. Chanllenge.\n");
+        printf(" 4. Log out. \n");
+        printf(" 0. Exit program. \n");
+        printf(" ============================================ \n");
+        printf(" Enter your choice: ");
+        scanf("%d", &menu);
         system("clear");
         switch (menu)
         {
@@ -100,7 +107,6 @@ void lobbyScreen(){
             break;
         }
     }
-    
 }
 void readyScreen()
 {
@@ -109,15 +115,20 @@ void readyScreen()
     while (1)
     {
         system("clear");
-        printf (" =================== Caro =================== \n");
-        printf (" username is ready, waiting for match ...\n");
-        printf (" 1. Back to lobby \n");
-        printf (" 0. Exit program. \n");
-        printf (" ============================================ \n");
-        printf (" Enter your choice: ");
-        sleep(3);
+        printf(" =================== Caro =================== \n");
+        printf(" username is ready, waiting for match ...\n");
+        printf(" 1. Back to lobby \n");
+        printf(" 0. Exit program. \n");
+        printf(" ============================================ \n");
+        // printf(" Enter your choice: ");
+        // printf(" Join game in 3s\n");
+        // sleep(1);
+        // printf(" Join game in 2s\n");
+        // sleep(1);
+        // printf(" Join game in 1s\n");
+        // sleep(1);
         inGameScreen();
-        scanf("%d",&menu);
+        scanf("%d", &menu);
         switch (menu)
         {
         case 1:
@@ -130,41 +141,88 @@ void readyScreen()
         }
     }
 }
-void inGameScreen(){
-    int menu,moveColumn,moveRow;
-    int board[3][3]={0};
-    system("clear");
-    while (1)
+int checkWinner()
+{
+    // return 1;
+}
+int checkOver(int board[SQUARE][SQUARE])
+{
+    for (int i = 0; i < SQUARE; i++)
     {
-        printf (" \n=================== Caro =================== \n");
-            printf ("|---|---|---|\n");
+        for (int j = 0; j < SQUARE; j++)
+        {
+            if (board[i][j] == 0)
+            {
+                return 0;// If any cell is empty, the game is not over
+            }
+            
+        }
+    }
+    return 1;
+}
+void inGameScreen()
+{
+    int menu, moveColumn, moveRow;
+    int player = 1;
+    int board[3][3] = {0};
+    system("clear");
+    while (!checkOver(board))
+    {
+        printf(" \n=================== Caro =================== \n");
+        printf("\n    1   2   3  \n");
+        printf(  "  |---|---|---|\n");
 
         for (int i = 0; i < 3; i++)
         {
-            printf("| %s | %s | %s |\n",board[i][0]==0?" ":board[i][0]==1?"X":board[i][0]==2?"O",
-                                        board[i][1]==0?" ":board[i][1]==1?"X":"O",
-                                        board[i][2]==0?" ":board[i][2]==1?"X":"O");
-            printf ("|---|---|---|\n");
+            // printf("%d | %s | %s | %s |\n", i + 1,  board[i][0] == 0 ? " " : board[i][0] == 1 ? "X" : board[i][0] == 2   ? "O" : NULL,
+            //                                         board[i][1] == 0 ? " " : board[i][1] == 1 ? "X" : board[i][1] == 2   ? "O" : NULL,
+            //                                         board[i][2] == 0 ? " " : board[i][2] == 1 ? "X" : board[i][2] == 2   ? "O" : NULL);
+            // printf("  |---|---|---|\n");
+            printf("%d | %s | %s | %s |\n", i + 1,  board[i][0] == 0 ? "0" : board[i][0] == 1 ? "1" : board[i][0] == 2   ? "2" : NULL,
+                                                    board[i][1] == 0 ? "0" : board[i][1] == 1 ? "1" : board[i][1] == 2   ? "2" : NULL,
+                                                    board[i][2] == 0 ? "0" : board[i][2] == 1 ? "1" : board[i][2] == 2   ? "2" : NULL);
+            printf("  |---|---|---|\n");
         }
-        printf ("1. Move \n");
-        printf ("2. Quit game. \n");
-        printf ("0. Exit program. \n");
-        printf ("============================================ \n");
-        printf ("Enter your choice: ");
-        scanf("%d",&menu);
+        printf("player %d turn\n", player);
+        printf("1. Move \n");
+        printf("2. Quit game. \n");
+        printf("0. Exit program. \n");
+        printf("============================================ \n");
+        printf("Enter your choice: ");
+        scanf("%d", &menu);
         switch (menu)
         {
         case 1:
             printf("Enter the position you want to move:\n");
-            printf(" row   : ");scanf("%d",&moveColumn);
-    
-            printf(" column: ");scanf("%d",&moveRow);
-            if (moveRow > 3 || moveColumn > 3)
+            printf(" row   : ");
+            if (scanf("%d", &moveRow) != 1 || moveRow > 3 || moveRow < 1)
             {
-                printf("Wrong input. Please try again");
+                printf("Wrong input for row. Please enter a valid integer between 1 and 3.\n");
+                clearInputBuffer(); // Clear the input buffer
+                getchar();
+                break;
+            }
+
+            printf(" column: ");
+            if (scanf("%d", &moveColumn) != 1 || moveColumn > 3 || moveColumn < 1)
+            {
+                printf("Wrong input for column. Please enter a valid integer between 1 and 3.\n");
+                clearInputBuffer(); // Clear the input buffer
+                getchar();
+                break;
+            }
+            if (board[moveRow - 1][moveColumn - 1] != 0)
+            {
+                printf("This position is already taken. Please choose another one.\n");
+                clearInputBuffer(); // Clear the input buffer
+                getchar();
+                break;
             }
             else
-                board[moveColumn-1][moveRow-1]=1;
+            {
+                board[moveRow - 1][moveColumn - 1] = player;
+                player = player % 2 ? 2 : 1;
+            }
             break;
         case 2:
             system("clear");
@@ -175,47 +233,54 @@ void inGameScreen(){
             break;
         }
         system("clear");
+        // printf("player %d turn\n", player);
     }
+    lobbyScreen();
 }
 // void printEachUserRank(char *username, int score, char *status){
 //     printf("|%8d|%10s|%15d|%6s|\n",1234,username, score, status);
 // }
-void printEachUserRank(){
+void printEachUserRank()
+{
 
-    printf("|%8d|%10s|%15d|%6s|\n",1234,"chien", 650, "online");
-    printf("|%8d|%10s|%15d|%6s|\n",1234,"chien", 650, "online");
-    printf("|%8d|%10s|%15d|%6s|\n",1234,"chien", 650, "online");
-    printf("|%8d|%10s|%15d|%6s|\n",1234,"chien", 650, "online");
-    printf("|%8d|%10s|%15d|%6s|\n",1234,"chien", 650, "online");
-    printf("|%8d|%10s|%15d|%6s|\n",1234,"chien", 650, "online");
-    printf("|%8d|%10s|%15d|%6s|\n",1234,"chien", 650, "online");
+    printf("|%8d|%10s|%15d|%6s|\n", 1234, "chien", 650, "online");
+    printf("|%8d|%10s|%15d|%6s|\n", 1234, "chien", 650, "online");
+    printf("|%8d|%10s|%15d|%6s|\n", 1234, "chien", 650, "online");
+    printf("|%8d|%10s|%15d|%6s|\n", 1234, "chien", 650, "online");
+    printf("|%8d|%10s|%15d|%6s|\n", 1234, "chien", 650, "online");
+    printf("|%8d|%10s|%15d|%6s|\n", 1234, "chien", 650, "online");
+    printf("|%8d|%10s|%15d|%6s|\n", 1234, "chien", 650, "online");
 }
 
-void printUserRank(){
-    printf("|%8s|%10s|%15s|%6s|\n","UserID","  Username", "Ranking Score", "Status");
-    printf("|%8s|%10s|%15s|%6s|\n","--------","----------", "--------------", "------");
+void printUserRank()
+{
+    printf("|%8s|%10s|%15s|%6s|\n", "UserID", "  Username", "Ranking Score", "Status");
+    printf("|%8s|%10s|%15s|%6s|\n", "--------", "----------", "--------------", "------");
     printEachUserRank();
 }
-void rankingScreen(){
+void rankingScreen()
+{
     char ch1;
     printUserRank();
     printf("Enter to back to menu\n");
-    
+
     // system("pause");
     getchar();
     // system("clear");
 }
-void challengeScreen(){
+void challengeScreen()
+{
     rankingScreen();
     int chossenUser;
     printf("Enter the user ID you want to challenge: ");
-    scanf("%d",&chossenUser);
+    scanf("%d", &chossenUser);
     system("clear");
-    printf("Challenge sent to user %d\n",chossenUser);
-    printf("Waiting for response from user %d\n",chossenUser);
+    printf("Challenge sent to user %d\n", chossenUser);
+    printf("Waiting for response from user %d\n", chossenUser);
     // sleep(3);
     inGameScreen();
 }
-int main () {
+int main()
+{
     loginScreen();
 }
