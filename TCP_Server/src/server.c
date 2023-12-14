@@ -62,6 +62,8 @@ void *handleClient(void *arg)
     char sendMessage[STRING_LENGTH];
     char recvMessage[STRING_LENGTH];
 
+    free(arg);
+
     printf("Client %d request connect\n", client_socket);
     send_with_error_handling(client_socket, sendMessage, int_to_string(CONNECTED_SUCCESSFULLY), "Send message failed");
     while (recv_with_error_handling(
@@ -86,9 +88,19 @@ void router(int client_socket, const char *message)
     char buffer[STRING_LENGTH];
     sscanf(message, "%s %[^\n]", keyword, parameter);
 
+    printf("keywork ne: %s %d\n", keyword, strcmp(keyword, "ONLINE"));
+
     if (strcmp(keyword, "USER") == 0)
     {
         login(client_socket, parameter);
+    }
+    else if (strcmp(keyword, "SIGNUP") == 0)
+    {
+        signUp(client_socket, parameter);
+    }
+    else if (strcmp(keyword, "ONLINE") == 0)
+    {
+        send_all_sessions(client_socket);
     }
     else if (strcmp(keyword, "BYE") == 0)
     {

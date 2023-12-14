@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "tcp.h": "c",
+    "session.h": "c",
+    "auth.h": "c",
+    "stdio.h": "c",
+    "pthread.h": "c",
+    "socket.h": "c",
+    "article.h": "c",
+    "utils.h": "c"
+  }
+}

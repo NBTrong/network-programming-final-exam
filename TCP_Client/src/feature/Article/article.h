@@ -15,4 +15,6 @@
  */
 void postArticle(int socket);
 
+void getListUserOnline(int socket);
+
 #endif // ARTICLE_H

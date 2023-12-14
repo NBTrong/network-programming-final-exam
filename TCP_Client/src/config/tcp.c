@@ -143,6 +143,15 @@ void printStatusMessage(const char *status)
     case 130:
         printf("Logout successful.\n");
         break;
+    case 410:
+        printf("Account exited, please other username");
+        break;
+    case 411:
+        printf("Sign up successfully, please login to use services");
+        break;
+    case 511:
+        printf("Get list user successfully\n");
+        break;
     default:
         printf("Unknown status code: %d\n", code);
         break;

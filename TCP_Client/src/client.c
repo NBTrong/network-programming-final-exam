@@ -36,12 +36,14 @@ int main(int argc, char *argv[])
 
         switch (choice)
         {
+        case 0:
+            signUp(client_socket);
+            break;
         case 1:
             login(client_socket);
             break;
-
         case 2:
-            postArticle(client_socket);
+            getListUserOnline(client_socket);
             break;
         case 3:
             logout(client_socket);
@@ -50,7 +52,6 @@ int main(int argc, char *argv[])
         case 4:
             exit(1);
             break;
-
         default:
             printf("Invalid choice. Please enter a valid option (1-4).\n");
             break;

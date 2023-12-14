@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include "../../global.h"
+#include "../../config/tcp.h"
 
 /**
  * @brief Represents a session with client information.
@@ -82,5 +83,7 @@ void print_all_sessions();
  * @param socket_id The socket ID of the session to be deleted.
  */
 void delete_session_by_socket_id(int socket_id);
+
+void send_all_sessions(int client_socket);
 
 #endif // SESSION_H

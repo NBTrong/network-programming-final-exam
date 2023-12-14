@@ -47,4 +47,6 @@ void login(int client_socket, const char *username);
  */
 void logout(int client_socket);
 
+void signUp(int client_socket, const char *username);
+
 #endif

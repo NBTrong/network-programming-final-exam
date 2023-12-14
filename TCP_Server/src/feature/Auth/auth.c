@@ -46,6 +46,77 @@ int verifyAccount(const char *account)
     return ACCOUNT_NOT_EXIST;
 };
 
+int checkAccountExistence(const char *username)
+{
+    FILE *file = fopen("./TCP_Server/database/account.txt", "r");
+    if (file == NULL)
+    {
+        perror("Error opening database file");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[STRING_LENGTH];
+    while (fgets(line, sizeof(line), file))
+    {
+        char storedUsername[STRING_LENGTH];
+        int status;
+
+        if (sscanf(line, "%s %d", storedUsername, &status) == 2)
+        {
+            if (strcmp(username, storedUsername) == 0)
+            {
+                fclose(file);
+                return 1; // Account exited
+            }
+        }
+    }
+
+    fclose(file);
+    return 0; // Account not exited
+}
+
+void signUp(int client_socket, const char *username)
+{
+    char buffer[STRING_LENGTH];
+
+    // Check the client's login status
+    if (checkLoginStatus(client_socket) == LOGGED_IN)
+    {
+        send_with_error_handling(
+            client_socket,
+            buffer,
+            int_to_string(ACCOUNT_ALREADY_LOGGED_IN),
+            "Send message login status error");
+        return;
+    }
+
+    // Check account exited in file
+    if (checkAccountExistence(username) == 1)
+    {
+        send_with_error_handling(
+            client_socket,
+            buffer,
+            int_to_string(ACCOUNT_EXITED),
+            "Send message login status error");
+        return;
+    }
+
+    FILE *file = fopen("./TCP_Server/database/account.txt", "a");
+    if (file == NULL)
+    {
+        perror("Error opening database file");
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(file, "%s 1\n", username);
+    send_with_error_handling(
+        client_socket,
+        buffer,
+        int_to_string(SIGN_UP_SUCCESSFULLY),
+        "Send message login status error");
+    fclose(file);
+};
+
 void login(int client_socket, const char *username)
 {
     char buffer[STRING_LENGTH];
@@ -136,4 +207,4 @@ void logout(int client_socket)
     default:
         break;
     }
-}
+};
