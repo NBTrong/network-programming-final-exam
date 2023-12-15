@@ -109,7 +109,7 @@ void send_all_sessions(int client_socket)
 
   // Critical section: read shared data (e.g., session_list)
   Session *current = session_list;
-  char user_list[STRING_LENGTH] = ""; // String to store the list of logged-in users
+  char user_list[STRING_LENGTH] = " "; // String to store the list of logged-in users
 
   if (current == NULL)
   {
@@ -117,6 +117,7 @@ void send_all_sessions(int client_socket)
                              user_list,
                              user_list,
                              "Send user list error");
+    return;
   }
   // Append usernames to the user_list string
   while (current != NULL)
@@ -132,7 +133,6 @@ void send_all_sessions(int client_socket)
   pthread_mutex_unlock(&mutex);
 
   // Send the list of logged-in users to the client
-  printf("Chuoi: %s\n", user_list);
   char buffer[STRING_LENGTH];
   send_with_error_handling(client_socket,
                            buffer,

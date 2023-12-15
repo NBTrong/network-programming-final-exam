@@ -88,8 +88,6 @@ void router(int client_socket, const char *message)
     char buffer[STRING_LENGTH];
     sscanf(message, "%s %[^\n]", keyword, parameter);
 
-    printf("keywork ne: %s %d\n", keyword, strcmp(keyword, "ONLINE"));
-
     if (strcmp(keyword, "USER") == 0)
     {
         login(client_socket, parameter);

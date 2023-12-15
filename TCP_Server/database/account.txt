@@ -2,3 +2,5 @@ tungbt 1
 admin 1
 ductq 0
 batrong 1
+badung 1
+new_account 1

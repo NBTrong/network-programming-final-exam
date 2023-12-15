@@ -7,10 +7,19 @@ void processUserList(const char *userList)
   strncpy(userListCopy, userList, sizeof(userListCopy));
 
   char *token = strtok(userListCopy, " "); // Split the first username
+  int userCount = 0;
+
   while (token != NULL)
   {
-    printf("%s online\n", token); // Print each username as "user online"
-    token = strtok(NULL, " ");    // Split the next username
+    printf("%s online\n", token);
+    token = strtok(NULL, " ");
+    userCount++;
+  }
+
+  // Check if no users are online and replace with a space if needed
+  if (userCount == 0)
+  {
+    printf("No users online\n");
   }
 }
 
