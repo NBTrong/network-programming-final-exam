@@ -155,6 +155,7 @@ int checkWinner(int board[3][3])
 
         if ((board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != 0) || (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != 0))
         {
+            printf("checked  winner\n");
             return board[i][i]; // Return the player symbol (1 or 2) who won
         }
     }
@@ -235,14 +236,14 @@ void inGameScreen()
             printf(" column: ");
             if (scanf("%d", &moveColumn) != 1 || moveColumn > 3 || moveColumn < 1)
             {
-                printf("Wrong input for column. Please enter a valid integer between 1 and 3.\n");
+                printf("Wrong input for column. Please press enter and enter a valid integer between 1 and 3.\n");
                 clearInputBuffer(); // Clear the input buffer
                 getchar();
                 break;
             }
             if (board[moveRow - 1][moveColumn - 1] != 0)
             {
-                printf("This position is already taken. Please choose another one.\n");
+                printf("This position is already taken. Please press enter and choose another move.\n");
                 clearInputBuffer(); // Clear the input buffer
                 getchar();
                 break;
@@ -261,24 +262,24 @@ void inGameScreen()
         default:
             break;
         }
-    }
-    if (checkOver(board))// if all cell is not empty
-    {
-        printf("============================================ \n");
-        printf("Draw !!!\nEnter to back to lobby screen\n");
-        printf("============================================ \n");
-        clearInputBuffer(); // Clear the input buffer
-        getchar();
-        lobbyScreen();
-    }
-    if (!checkWinner(board)) // if no one win
-    {
-        printf("============================================ \n");
-        printf("Player %d win !!!\nEnter to back to lobby screen\n", checkWinner(board));
-        printf("============================================ \n");
-        clearInputBuffer(); // Clear the input buffer
-        getchar();
-        lobbyScreen();
+        if (checkOver(board))// if all cell is not empty
+        {
+            printf("============================================ \n");
+            printf("Draw !!!\nEnter to back to lobby screen\n");
+            printf("============================================ \n");
+            clearInputBuffer(); // Clear the input buffer
+            getchar();
+            lobbyScreen();
+        }
+        if (checkWinner(board)!=0) // if no one win
+        {
+            printf("============================================ \n");
+            printf("Player %d win !!!\nEnter to back to lobby screen\n", checkWinner(board));
+            printf("============================================ \n");
+            clearInputBuffer(); // Clear the input buffer
+            getchar();
+            lobbyScreen();
+        }
     }
     printf("Enter to back to lobby screen\n");
     clearInputBuffer(); // Clear the input buffer
