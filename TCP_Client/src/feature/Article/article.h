@@ -17,4 +17,6 @@ void postArticle(int socket);
 
 void getListUserOnline(int socket);
 
+void processUserList(const char *userList);
+
 #endif // ARTICLE_H

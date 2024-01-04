@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <libgen.h>
+#include "../feature/Article/article.h"
 
 /**
  * Connect to a server using the specified IP address and port number.

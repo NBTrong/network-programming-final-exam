@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "../../global.h"
 #include "../../config/tcp.h"
+#include "../Auth/auth.h"
 
 /**
  * @brief Represents a session with client information.

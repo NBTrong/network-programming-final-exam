@@ -111,6 +111,20 @@ int connect_server(const char *server_ip_address, int server_port_number)
 void printStatusMessage(const char *status)
 {
     int code = atoi(status);
+
+    if (code == 0)
+    {
+        if (strncmp(status, "ONLINE", strlen("ONLINE")) == 0)
+        {
+            processUserList(status + strlen("ONLINE"));
+        }
+        else
+        {
+            printf("Response invalid: %s.\n", status);
+        }
+        return;
+    }
+
     switch (code)
     {
     case 100:
@@ -144,10 +158,10 @@ void printStatusMessage(const char *status)
         printf("Logout successful.\n");
         break;
     case 410:
-        printf("Account exited, please other username");
+        printf("Account exited, please other username\n");
         break;
     case 411:
-        printf("Sign up successfully, please login to use services");
+        printf("Sign up successfully, please login to use services\n");
         break;
     case 511:
         printf("Get list user successfully\n");

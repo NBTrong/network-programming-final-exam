@@ -11,6 +11,31 @@
 #include "./feature/Auth/auth.h"
 #include "./feature/Article/article.h"
 
+int isResponse = 1;
+pthread_mutex_t lock;
+
+void *server_response_handler(void *socket)
+{
+    int sockfd = *(int *)socket;
+
+    while (1)
+    {
+        char buffer[STRING_LENGTH];
+        recv_with_error_handling(
+            sockfd,
+            buffer,
+            sizeof(buffer),
+            "Error receiving data from the client");
+
+        pthread_mutex_lock(&lock);
+        printStatusMessage(buffer);
+        isResponse = 1;
+        pthread_mutex_unlock(&lock);
+    }
+
+    return NULL;
+}
+
 int main(int argc, char *argv[])
 {
     // Handle argv
@@ -24,16 +49,27 @@ int main(int argc, char *argv[])
 
     // Connect server
     int client_socket = connect_server(ip_address, port_number);
+    printf("Client socket %d \n", client_socket);
+
+    pthread_t thread_id;
+    if (pthread_create(&thread_id, NULL, &server_response_handler, &client_socket))
+    {
+        perror("Could not create thread");
+        return 1;
+    }
 
     int choice = 0;
 
     while (choice != 4)
     {
         menu();
-
+        while (isResponse != 1)
+        {
+            sleep(1);
+        }
         printf("Enter your choice(1-4): ");
         input(&choice, "int");
-
+        isResponse = 0;
         switch (choice)
         {
         case 0:
@@ -56,9 +92,10 @@ int main(int argc, char *argv[])
             printf("Invalid choice. Please enter a valid option (1-4).\n");
             break;
         }
-        choice = 0;
+        choice = -1;
     }
 
+    pthread_join(thread_id, NULL);
     close(client_socket);
 
     return 0;
