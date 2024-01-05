@@ -88,13 +88,14 @@ void print_all_sessions()
   Session *current = session_list;
 
   // Print header
-  printf("Socket ID\tClient Address\t\t\tUsername\tLogin Status\n");
+  printf("|%-11s|%-16s|%-10s|%-14s|\n"," Socket ID "," Client Address "," Username "," Login Status ");
 
   // Print each session
   while (current != NULL)
   {
-    printf("%d\t\t%s\t\t%s\t\t%d\n", current->socket_id,
-           current->client_addr, current->client_username, current->login_status);
+    printf("|%-11s|%-16s|%-10s|%-14s|\n","-----------","----------------","----------","--------------");
+    printf("| %-10d| %-15s| %-9s| %-13s|\n", current->socket_id,
+           current->client_addr, current->client_username, current->login_status == 3 ? "online" : "offline");
     current = current->next;
   }
 

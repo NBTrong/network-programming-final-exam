@@ -1,5 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "screens.h"
 #define SQUARE 3
+
+void clearInputBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+    { /* Clear input buffer */
+    }
+}
 int checkWinner(int board[SQUARE][SQUARE])
 {
     // printf("check winner\n");
@@ -38,36 +49,49 @@ int checkOver(int board[SQUARE][SQUARE])
     }
     return 1;
 }
-void inGameScreen()
+void inGameScreen(int client_socket)
 {
+    char buffer[STRING_LENGTH];
+    char message[STRING_LENGTH + 5];
     int menu, moveColumn, moveRow;
-    int player = 1;
     int board[3][3] = {0};
-    system("clear");
+    // system("clear");
+    // Get user turn
+    sprintf(message, "GETUSERTURN");
+    printf("\nsent message: '%s'\n", message);
+    send_with_error_handling(
+        client_socket,
+        buffer,
+        message,
+        "Send message login status error");
+
+    recv_with_error_handling(
+        client_socket,
+        buffer,
+        sizeof(buffer),
+        "Error receiving data from the client");
+
+    int player = atoi(buffer);
     while (1)
     {
 
-        system("clear");
         printf(" \n=================== Caro =================== \n");
-        printf("\n    1   2   3  \n");
-        printf("  |---|---|---|\n");
+        printf("\n  1   2   3  \n");
+        printf("|---|---|---|\n");
 
         for (int i = 0; i < SQUARE; i++)
         {
-            printf("%d | %s | %s | %s |\n", i + 1,  board[i][0] == 0 ? " " : board[i][0] == 1 ? "X": board[i][0] == 2   ? "O": NULL,
-                                                    board[i][1] == 0 ? " " : board[i][1] == 1 ? "X": board[i][1] == 2   ? "O": NULL,
-                                                    board[i][2] == 0 ? " " : board[i][2] == 1 ? "X": board[i][2] == 2   ? "O": NULL);
-            // printf("%d | %s | %s | %s |\n", i + 1, board[i][0] == 0 ? "0" : board[i][0] == 1 ? "1"
-            //                                                             : board[i][0] == 2   ? "2"
-            //                                                                                  : NULL,
-            //        board[i][1] == 0 ? "0" : board[i][1] == 1 ? "1"
-            //                             : board[i][1] == 2   ? "2"
-            //                                                  : NULL,
-            //        board[i][2] == 0 ? "0" : board[i][2] == 1 ? "1"
-            //                             : board[i][2] == 2   ? "2"
-            //                                                  : NULL);
-
-            printf("  |---|---|---|\n");
+            printf("| %s | %s | %s |\n",
+                   board[i][0] == 0 ? " " : board[i][0] == 1 ? "X"
+                                        : board[i][0] == 2   ? "O"
+                                                             : NULL,
+                   board[i][1] == 0 ? " " : board[i][1] == 1 ? "X"
+                                        : board[i][1] == 2   ? "O"
+                                                             : NULL,
+                   board[i][2] == 0 ? " " : board[i][2] == 1 ? "X"
+                                        : board[i][2] == 2   ? "O"
+                                                             : NULL);
+            printf("|---|---|---|\n");
         }
         printf("player %d turn\n", player);
         printf("1. Move \n");
@@ -79,7 +103,7 @@ void inGameScreen()
         switch (menu)
         {
         case 1:
-            printf("Enter the position you want to move:\n");
+            printf("From 1-9 enter the position you want to move:\n");
             printf(" row   : ");
             if (scanf("%d", &moveRow) != 1 || moveRow > 3 || moveRow < 1)
             {
@@ -112,33 +136,34 @@ void inGameScreen()
             break;
         case 2:
             system("clear");
-            lobbyScreen();
+            lobbyScreen(client_socket);
+            break;
         case 0:
             exit(0);
         default:
             break;
         }
-        if (checkOver(board))// if all cell is not empty
+        if (checkOver(board)) // if all cell is not empty
         {
             printf("============================================ \n");
             printf("Draw !!!\nEnter to back to lobby screen\n");
             printf("============================================ \n");
             clearInputBuffer(); // Clear the input buffer
             getchar();
-            lobbyScreen();
+            lobbyScreen(client_socket);
         }
-        if (checkWinner(board)!=0) // if no one win
+        if (checkWinner(board) != 0) // if no one win
         {
             printf("============================================ \n");
             printf("Player %d win !!!\nEnter to back to lobby screen\n", checkWinner(board));
             printf("============================================ \n");
             clearInputBuffer(); // Clear the input buffer
             getchar();
-            lobbyScreen();
+            lobbyScreen(client_socket);
         }
     }
     printf("Enter to back to lobby screen\n");
     clearInputBuffer(); // Clear the input buffer
     getchar();
-    lobbyScreen();
+    lobbyScreen(client_socket);
 }

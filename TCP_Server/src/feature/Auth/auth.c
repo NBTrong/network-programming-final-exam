@@ -14,7 +14,7 @@ int checkLoginStatus(int client_socket)
 int verifyAccount(const char *account)
 {
     // Read file
-    FILE *file = fopen("./TCP_Server/database/account.txt", "r"); // Open the file in read mode ("r")
+    FILE *file = fopen("./TCP_Server/database/account_status.txt", "r"); // Open the file in read mode ("r")
 
     if (file == NULL)
     {

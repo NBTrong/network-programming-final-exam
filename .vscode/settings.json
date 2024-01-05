@@ -1,5 +1,19 @@
 {
     "files.associations": {
-        "ingamescreen.c": "cpp"
+        "ingamescreen.c": "cpp",
+        "utils.h": "c",
+        "menu.h": "c",
+        "auth.h": "c",
+        "article.h": "c",
+        "global.h": "c",
+        "tcp.h": "c",
+        "lobbyscreen.c": "cpp",
+        "rankingscreen.c": "cpp",
+        "challengescreen.c": "cpp",
+        "readyscreen.c": "cpp",
+        "screens.h": "c",
+        "session.h": "c",
+        "stdio.h": "c",
+        "gamehandler.h": "c"
     }
 }

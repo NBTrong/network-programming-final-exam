@@ -1,4 +1,6 @@
-void loginScreen()
+#include "screens.h"
+#include "../feature/Auth/auth.h"
+void loginScreen(int client_socket)
 {
     int menu;
     while (1)
@@ -10,16 +12,19 @@ void loginScreen()
         printf(" ============================================ \n");
         printf(" Enter your choice: ");
         scanf("%d", &menu);
-        system("clear");
+        // system("clear");
         switch (menu)
         {
         case 1:
-            lobbyScreen();
+            if ( login(client_socket) == 110)
+                lobbyScreen(client_socket);
+            // inGameScreen(client_socket);
             break;
         case 2:
             break;
         case 0:
             exit(0);
+            break;
         default:
             break;
         }

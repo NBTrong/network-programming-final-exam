@@ -1,4 +1,6 @@
-void readyScreen()
+#include "screens.h"
+
+void readyScreen(int client_socket)
 {
     int menu;
     system("clear");
@@ -17,12 +19,12 @@ void readyScreen()
         // sleep(1);
         // printf(" Join game in 1s\n");
         // sleep(1);
-        inGameScreen();
+        inGameScreen(client_socket);
         scanf("%d", &menu);
         switch (menu)
         {
         case 1:
-            lobbyScreen();
+            lobbyScreen(client_socket);
             break;
         case 0:
             exit(0);

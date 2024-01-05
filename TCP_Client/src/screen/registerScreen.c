@@ -1,9 +1,12 @@
+#include "screens.h"
+
 #define MAX_LEN 255
 
-void registerScreen()
+void registerScreen(int client_socket)
 {
     int menu;
-    char username[MAX_LEN], password[MAX_LEN];
+    char username[MAX_LEN];
+    // char username[MAX_LEN], password[MAX_LEN];
     while (1)
     {
         printf(" =================== Caro =================== \n");
@@ -16,7 +19,7 @@ void registerScreen()
         switch (menu)
         {
         case 1:
-            lobbyScreen();
+            lobbyScreen(client_socket);
             break;
         case 2:
             break;

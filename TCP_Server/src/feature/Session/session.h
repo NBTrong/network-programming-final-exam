@@ -21,7 +21,8 @@ typedef struct Session
   int port;                            // Port number for communication
   char client_username[STRING_LENGTH]; // Username associated with the session
   int login_status;                    // Login status (e.g., LOGGED_IN or NOT_LOGGED_IN)
-
+  int userTurn;                         // User turn 0: "empty", 1: "X", 2: "O"
+  int gameID;                           // Game ID
   struct Session *next; // Pointer to the next session in the linked list
 } Session;
 

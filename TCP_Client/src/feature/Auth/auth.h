@@ -14,7 +14,7 @@
  *
  * @param socket The socket used for communication with the server.
  */
-void login(int socket);
+int login(int socket);
 
 /**
  * @brief Perform logout operation.
