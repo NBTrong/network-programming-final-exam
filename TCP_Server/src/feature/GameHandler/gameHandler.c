@@ -92,16 +92,16 @@ int updateMove(int client_send_challange_socket_turn_X,int client_receive_challa
     char buffer[STRING_LENGTH];
     memset(buffer, 0, STRING_LENGTH);
     // sprintf(buffer, "%d", move);
-    send_with_error_handling(
-        client_send_challange_socket_turn_X,
-        buffer,
-        int_to_string(move),
-        "Send message move error");
-    send_with_error_handling(
-        client_receive_challange_socket_turn_O,
-        buffer,
-        int_to_string(move),
-        "Send message move error");
+    // send_with_error_handling(
+    //     client_send_challange_socket_turn_X,
+    //     buffer,
+    //     int_to_string(move),
+    //     "Send message move error");
+    // send_with_error_handling(
+    //     client_receive_challange_socket_turn_O,
+    //     buffer,
+    //     int_to_string(move),
+    //     "Send message move error");
 
     return 0;
 }

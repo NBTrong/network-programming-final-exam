@@ -1,0 +1,4 @@
+TCP_Client/build/*
+TCP_Server/build/*
+./client
+./server
