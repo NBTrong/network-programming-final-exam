@@ -71,4 +71,10 @@ enum GameStatus{
   LOSE = 5,
   DRAW = 6
 };
+
+
+#define  ACCOUNT_FILE_PATH "./TCP_Server/database/account.txt"
+#define  GAME_LOG_PATH "./TCP_Server/database/log.txt"
+
+
 #endif
