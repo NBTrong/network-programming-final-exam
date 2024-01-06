@@ -10,8 +10,8 @@
 #include "./config/menu.h"
 #include "./feature/Auth/auth.h"
 #include "./feature/Article/article.h"
+#include "./feature/Request/request.h"
 
-int isResponse = 1;
 pthread_mutex_t lock;
 
 void *server_response_handler(void *socket)
@@ -28,8 +28,11 @@ void *server_response_handler(void *socket)
             "Error receiving data from the client");
 
         pthread_mutex_lock(&lock);
-        printStatusMessage(buffer);
-        isResponse = 1;
+        printStatusMessage(buffer, sockfd);
+        if (strncmp(buffer, "RECV_REQUEST", strlen("RECV_REQUEST")) != 0)
+        {
+            isResponse = 1;
+        }
         pthread_mutex_unlock(&lock);
     }
 
@@ -49,7 +52,6 @@ int main(int argc, char *argv[])
 
     // Connect server
     int client_socket = connect_server(ip_address, port_number);
-    printf("Client socket %d \n", client_socket);
 
     pthread_t thread_id;
     if (pthread_create(&thread_id, NULL, &server_response_handler, &client_socket))
@@ -65,11 +67,12 @@ int main(int argc, char *argv[])
         menu();
         while (isResponse != 1)
         {
-            sleep(1);
+            sleep(0.1);
         }
         printf("Enter your choice(1-4): ");
         input(&choice, "int");
         isResponse = 0;
+
         switch (choice)
         {
         case 0:
@@ -84,9 +87,11 @@ int main(int argc, char *argv[])
         case 3:
             logout(client_socket);
             break;
-
         case 4:
             exit(1);
+            break;
+        case 5:
+            request(client_socket);
             break;
         default:
             printf("Invalid choice. Please enter a valid option (1-4).\n");

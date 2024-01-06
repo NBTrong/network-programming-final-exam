@@ -6,4 +6,6 @@
 
 #define STRING_LENGTH 100
 
+extern int isResponse;
+
 #endif

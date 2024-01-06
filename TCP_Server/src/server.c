@@ -11,6 +11,7 @@
 #include "./config/tcp.h"
 #include "./feature/Auth/auth.h"
 #include "./feature/Session/session.h"
+#include "./feature/Request/request.h"
 
 void router(int client_socket, const char *message);
 void *handleClient(void *arg);
@@ -99,6 +100,10 @@ void router(int client_socket, const char *message)
     else if (strcmp(keyword, "ONLINE") == 0)
     {
         send_all_sessions(client_socket);
+    }
+    else if (strcmp(keyword, "REQUEST") == 0)
+    {
+        handle_request(client_socket, parameter);
     }
     else if (strcmp(keyword, "BYE") == 0)
     {
