@@ -103,44 +103,14 @@ int connect_server(const char *server_ip_address, int server_port_number)
         buffer,
         sizeof(buffer),
         "Error receiving data from the client");
-    printStatusMessage(buffer, client_socket);
+    printStatusMessage(buffer);
 
     return client_socket;
 }
 
-void printStatusMessage(const char *status, int socket)
+void printStatusMessage(const char *status)
 {
     int code = atoi(status);
-
-    if (code == 0)
-    {
-        if (strncmp(status, "ONLINE", strlen("ONLINE")) == 0)
-        {
-            processUserList(status + strlen("ONLINE"));
-        }
-        else if (strncmp(status, "REQUEST", strlen("REQUEST")) == 0)
-        {
-            printf("Response from server: %s\n", status + strlen("REQUEST"));
-            while (isResponse != 1)
-            {
-                sleep(0.1);
-            }
-        }
-        else if (strncmp(status, "RECV_REQUEST", strlen("RECV_REQUEST")) == 0)
-        {
-            printf("Response from server: %s\n", status + strlen("RECV_REQUEST"));
-            reply_request(socket);
-        }
-        else if (strncmp(status, "RESULT_REQUEST", strlen("RESULT_REQUEST")) == 0)
-        {
-            printf("Response from server: %s\n", status + strlen("RESULT_REQUEST"));
-        }
-        else
-        {
-            printf("Response invalid: %s.\n", status);
-        }
-        return;
-    }
 
     switch (code)
     {

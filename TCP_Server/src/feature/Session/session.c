@@ -104,7 +104,7 @@ void print_all_sessions()
 
 void send_all_sessions(int client_socket)
 {
-  int result = checkLoginStatus(client_socket);
+  int result = check_login_status(client_socket);
   switch (result)
   {
   case LOGGED_IN:

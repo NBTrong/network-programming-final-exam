@@ -10,34 +10,7 @@
 #include "./config/menu.h"
 #include "./feature/Auth/auth.h"
 #include "./feature/Article/article.h"
-#include "./feature/Request/request.h"
-
-pthread_mutex_t lock;
-
-void *server_response_handler(void *socket)
-{
-    int sockfd = *(int *)socket;
-
-    while (1)
-    {
-        char buffer[STRING_LENGTH];
-        recv_with_error_handling(
-            sockfd,
-            buffer,
-            sizeof(buffer),
-            "Error receiving data from the client");
-
-        pthread_mutex_lock(&lock);
-        printStatusMessage(buffer, sockfd);
-        if (strncmp(buffer, "RECV_REQUEST", strlen("RECV_REQUEST")) != 0)
-        {
-            isResponse = 1;
-        }
-        pthread_mutex_unlock(&lock);
-    }
-
-    return NULL;
-}
+#include "./feature/Challenge/challenge.h"
 
 int main(int argc, char *argv[])
 {
@@ -53,45 +26,36 @@ int main(int argc, char *argv[])
     // Connect server
     int client_socket = connect_server(ip_address, port_number);
 
-    pthread_t thread_id;
-    if (pthread_create(&thread_id, NULL, &server_response_handler, &client_socket))
-    {
-        perror("Could not create thread");
-        return 1;
-    }
-
     int choice = 0;
 
     while (choice != 4)
     {
         menu();
-        while (isResponse != 1)
-        {
-            sleep(0.1);
-        }
         printf("Enter your choice(1-4): ");
         input(&choice, "int");
-        isResponse = 0;
 
         switch (choice)
         {
-        case 0:
+        case 1:
             signUp(client_socket);
             break;
-        case 1:
+        case 2:
             login(client_socket);
             break;
-        case 2:
+        case 3:
             getListUserOnline(client_socket);
             break;
-        case 3:
-            logout(client_socket);
-            break;
         case 4:
-            exit(1);
+            challenge(client_socket);
             break;
         case 5:
-            request(client_socket);
+            get_challenged_list(client_socket);
+            break;
+        case 99:
+            logout(client_socket);
+            break;
+        case 100:
+            exit(1);
             break;
         default:
             printf("Invalid choice. Please enter a valid option (1-4).\n");
@@ -100,7 +64,6 @@ int main(int argc, char *argv[])
         choice = -1;
     }
 
-    pthread_join(thread_id, NULL);
     close(client_socket);
 
     return 0;

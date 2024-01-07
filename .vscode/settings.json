@@ -9,6 +9,11 @@
     "article.h": "c",
     "utils.h": "c",
     "request.h": "c",
-    "global.h": "c"
+    "global.h": "c",
+    "challenge.h": "c",
+    "stdlib.h": "c",
+    "unistd.h": "c",
+    "room.h": "c",
+    "string.h": "c"
   }
 }

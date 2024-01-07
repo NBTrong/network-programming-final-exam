@@ -17,12 +17,12 @@ void signUp(int socket)
       message,
       "Send message login status error");
 
-  // recv_with_error_handling(
-  //     socket,
-  //     buffer,
-  //     sizeof(buffer),
-  //     "Error receiving data from the client");
-  // printStatusMessage(buffer);
+  recv_with_error_handling(
+      socket,
+      buffer,
+      sizeof(buffer),
+      "Error receiving data from the client");
+  printStatusMessage(buffer);
 }
 
 void login(int socket)
@@ -42,12 +42,12 @@ void login(int socket)
       message,
       "Send message login status error");
 
-  // recv_with_error_handling(
-  //     socket,
-  //     buffer,
-  //     sizeof(buffer),
-  //     "Error receiving data from the client");
-  // printStatusMessage(buffer);
+  recv_with_error_handling(
+      socket,
+      buffer,
+      sizeof(buffer),
+      "Error receiving data from the client");
+  printStatusMessage(buffer);
 }
 
 void logout(int socket)
@@ -60,10 +60,10 @@ void logout(int socket)
       "BYE",
       "Send message login status error");
 
-  // recv_with_error_handling(
-  //     socket,
-  //     buffer,
-  //     sizeof(buffer),
-  //     "Error receiving data from the client");
-  // printStatusMessage(buffer);
+  recv_with_error_handling(
+      socket,
+      buffer,
+      sizeof(buffer),
+      "Error receiving data from the client");
+  printStatusMessage(buffer);
 }

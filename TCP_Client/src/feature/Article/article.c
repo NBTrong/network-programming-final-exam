@@ -36,12 +36,12 @@ void getListUserOnline(int socket)
       message,
       "Send message login status error");
 
-  // recv_with_error_handling(
-  //     socket,
-  //     buffer,
-  //     sizeof(buffer),
-  //     "Error receiving data from the client");
-  // processUserList(buffer);
+  recv_with_error_handling(
+      socket,
+      buffer,
+      sizeof(buffer),
+      "Error receiving data from the client");
+  processUserList(buffer);
 }
 
 void postArticle(int socket)

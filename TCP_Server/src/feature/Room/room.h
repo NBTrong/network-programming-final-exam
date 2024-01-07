@@ -1,5 +1,5 @@
-#ifndef REQUEST_H
-#define REQUEST_H
+#ifndef ROOM_H
+#define ROOM_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +11,15 @@
 #include "../../utils/utils.h"
 #include "../../config/tcp.h"
 
-void handle_request(int client_socket, const char *opponent_name);
+typedef struct Room
+{
+  int sender_socket_id;
+  int receiver_socket_id;
+  struct Room *next;
+} Room;
+
+extern Room *room_list;
+
+Room *find_room_by_socket_id(int socket_id);
 
 #endif

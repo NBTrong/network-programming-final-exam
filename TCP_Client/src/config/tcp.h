@@ -11,7 +11,7 @@
 #include <libgen.h>
 #include "../feature/Article/article.h"
 #include "../global.h"
-#include "../feature/Request/request.h"
+#include "../feature/Challenge/challenge.h"
 
 /**
  * Connect to a server using the specified IP address and port number.
@@ -41,6 +41,6 @@ int send_with_error_handling(const int server_socket, char *buffer, const char *
  */
 int recv_with_error_handling(const int client_socket, char *buffer, size_t size, const char *error_message);
 
-void printStatusMessage(const char *status, int socket);
+void printStatusMessage(const char *status);
 
 #endif

@@ -11,10 +11,10 @@
 #include "./config/tcp.h"
 #include "./feature/Auth/auth.h"
 #include "./feature/Session/session.h"
-#include "./feature/Request/request.h"
+#include "./feature/Challenge/challenge.h"
 
 void router(int client_socket, const char *message);
-void *handleClient(void *arg);
+void *api(void *arg);
 
 int main(int argc, char *argv[])
 {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         }
 
         // Create thread
-        pthread_create(&tid, NULL, &handleClient, client_socket);
+        pthread_create(&tid, NULL, &api, client_socket);
     }
 
     // Close server
@@ -57,23 +57,23 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void *handleClient(void *arg)
+void *api(void *arg)
 {
     int client_socket = *(int *)arg;
-    char sendMessage[STRING_LENGTH];
-    char recvMessage[STRING_LENGTH];
+    char send_message[STRING_LENGTH];
+    char recv_message[STRING_LENGTH];
 
     free(arg);
 
     printf("Client %d request connect\n", client_socket);
-    send_with_error_handling(client_socket, sendMessage, int_to_string(CONNECTED_SUCCESSFULLY), "Send message failed");
+    send_with_error_handling(client_socket, send_message, int_to_string(CONNECTED_SUCCESSFULLY), "Send message failed");
     while (recv_with_error_handling(
         client_socket,
-        recvMessage,
-        sizeof(recvMessage),
+        recv_message,
+        sizeof(recv_message),
         "Error receiving data from the client"))
     {
-        router(client_socket, recvMessage);
+        router(client_socket, recv_message);
     }
 
     delete_session_by_socket_id(client_socket);
@@ -95,15 +95,24 @@ void router(int client_socket, const char *message)
     }
     else if (strcmp(keyword, "SIGNUP") == 0)
     {
-        signUp(client_socket, parameter);
+        sign_up(client_socket, parameter);
     }
     else if (strcmp(keyword, "ONLINE") == 0)
     {
         send_all_sessions(client_socket);
     }
-    else if (strcmp(keyword, "REQUEST") == 0)
+    else if (strcmp(keyword, "CHALLENGE") == 0)
     {
-        handle_request(client_socket, parameter);
+        if (check_login_status(client_socket) == NOT_LOGGED_IN)
+        {
+            send_with_error_handling(
+                client_socket,
+                buffer,
+                int_to_string(NOT_HAVE_ACCESS),
+                "Send message login status error");
+            return;
+        }
+        challenge_router(client_socket, parameter);
     }
     else if (strcmp(keyword, "BYE") == 0)
     {

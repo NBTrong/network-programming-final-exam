@@ -1,6 +1,6 @@
 #include "auth.h"
 
-int checkLoginStatus(int client_socket)
+int check_login_status(int client_socket)
 {
     Session *session = find_session_by_socket_id(client_socket);
     if (session == NULL)
@@ -11,7 +11,7 @@ int checkLoginStatus(int client_socket)
 
 // --------------------------------------- Login function ----------------------------------------------
 
-int verifyAccount(const char *account)
+int verify_account(const char *account)
 {
     // Read file
     FILE *file = fopen("./TCP_Server/database/account.txt", "r"); // Open the file in read mode ("r")
@@ -46,7 +46,7 @@ int verifyAccount(const char *account)
     return ACCOUNT_NOT_EXIST;
 };
 
-int checkAccountExistence(const char *username)
+int check_account_existence(const char *username)
 {
     FILE *file = fopen("./TCP_Server/database/account.txt", "r");
     if (file == NULL)
@@ -75,12 +75,12 @@ int checkAccountExistence(const char *username)
     return 0; // Account not exited
 }
 
-void signUp(int client_socket, const char *username)
+void sign_up(int client_socket, const char *username)
 {
     char buffer[STRING_LENGTH];
 
     // Check the client's login status
-    if (checkLoginStatus(client_socket) == LOGGED_IN)
+    if (check_login_status(client_socket) == LOGGED_IN)
     {
         send_with_error_handling(
             client_socket,
@@ -91,7 +91,7 @@ void signUp(int client_socket, const char *username)
     }
 
     // Check account exited in file
-    if (checkAccountExistence(username) == 1)
+    if (check_account_existence(username) == 1)
     {
         send_with_error_handling(
             client_socket,
@@ -122,7 +122,7 @@ void login(int client_socket, const char *username)
     char buffer[STRING_LENGTH];
 
     // Check the client's login status
-    if (checkLoginStatus(client_socket) == LOGGED_IN)
+    if (check_login_status(client_socket) == LOGGED_IN)
     {
         send_with_error_handling(
             client_socket,
@@ -146,7 +146,7 @@ void login(int client_socket, const char *username)
     }
 
     // Verify account
-    int result = verifyAccount(username);
+    int result = verify_account(username);
     switch (result)
     {
     case ACCOUNT_BANNED:
@@ -184,7 +184,7 @@ void logout(int client_socket)
 {
     char buffer[STRING_LENGTH];
 
-    int result = checkLoginStatus(client_socket);
+    int result = check_login_status(client_socket);
     switch (result)
     {
     case LOGGED_IN:

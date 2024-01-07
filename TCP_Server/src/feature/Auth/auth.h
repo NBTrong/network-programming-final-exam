@@ -18,7 +18,7 @@
  *
  * @return An integer constant representing the login status (LOGGED_IN or NOT_LOGGED_IN).
  */
-int checkLoginStatus(int client_socket);
+int check_login_status(int client_socket);
 
 /**
  * @brief Verify the status of an account in the account.txt file.
@@ -29,7 +29,7 @@ int checkLoginStatus(int client_socket);
  * @param account A string representing the account to be verified.
  * @return An integer constant representing the account status (ACCOUNT_BANNED, ACCOUNT_VALID, or ACCOUNT_NOT_EXIST).
  */
-int verifyAccount(const char *account);
+int verify_account(const char *account);
 
 /**
  * @brief Log in the user.
@@ -47,6 +47,6 @@ void login(int client_socket, const char *username);
  */
 void logout(int client_socket);
 
-void signUp(int client_socket, const char *username);
+void sign_up(int client_socket, const char *username);
 
 #endif
