@@ -1,5 +1,5 @@
-#ifndef CHALLENGE_H
-#define CHALLENGE_H
+#ifndef GAME_H
+#define GAME_H
 
 #include <stdio.h>
 #include "../../global.h"
@@ -9,10 +9,7 @@
 #include <sys/select.h>
 #include <unistd.h>
 #include "../../utils/utils.h"
-#include "../Game/game.h"
 
-void challenge(int socket);
+void game(int server_socket);
 
-void get_challenged_list(int client_socket);
-
-#endif // CHALLENGE_H
+#endif

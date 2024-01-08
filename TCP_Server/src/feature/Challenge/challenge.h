@@ -33,12 +33,14 @@ void add_challenge(
     char *sender_username,
     char *receiver_username);
 
-void delete_challenge(int client_socket, const char *parameter);
+void handle_cancel_challenge(int client_socket, char *enemy_username);
 
 Challenge *find_challenge(int sender_socket_id, int receiver_socket_id);
 
-Challenge *find_challenge_by_receiver_socket_id(int receiver_socket_id);
-
 void get_challenged_list(int client_socket);
+
+void handle_reject_challenge(int client_socket, char *sender_username);
+
+void handle_accept_challenge(int client_socket, char *sender_username);
 
 #endif

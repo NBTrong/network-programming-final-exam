@@ -6,6 +6,9 @@
 #include <sys/socket.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/select.h>
 
 #include "global.h"
 #include "./config/tcp.h"
@@ -14,7 +17,9 @@
 #include "./feature/Challenge/challenge.h"
 
 void router(int client_socket, const char *message);
-void *api(void *arg);
+void *handle_apis(void *arg);
+void *games_controller(void *arg);
+void init_game(void *arg);
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +33,15 @@ int main(int argc, char *argv[])
 
     // Init multi thread
     pthread_t tid;
+    pthread_create(&tid, NULL, &games_controller, NULL);
+
+    // Init socket mutex
+    pthread_mutex_init(&socket_mutex, NULL);
+    pthread_cond_init(&cond, NULL);
+    for (int i = 0; i < MAX_CLIENTS; i++)
+    {
+        in_game[i] = 0;
+    }
 
     // Init server
     int server_socket = init_server(port_number);
@@ -49,7 +63,7 @@ int main(int argc, char *argv[])
         }
 
         // Create thread
-        pthread_create(&tid, NULL, &api, client_socket);
+        pthread_create(&tid, NULL, &handle_apis, client_socket);
     }
 
     // Close server
@@ -57,7 +71,57 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void *api(void *arg)
+// ------------------- HANDLE GAME --------------------
+
+void *games_controller(void *arg)
+{
+    Message message;
+
+    key_t key;
+    int msgid;
+
+    // ftok to generate unique key
+    key = ftok("20194693", 65);
+
+    // msgget creates a message queue
+    // and returns identifier
+    msgid = msgget(key, 0666 | IPC_CREAT);
+    message.mess_type = 1;
+
+    while (msgrcv(msgid, &message, sizeof(message.room_data), 1, 0) != -1)
+    {
+        // Process the received message
+        printf("Received Message: Sender Socket ID: %d, Receiver Socket ID: %d, Sender username: %s, Receiver username: %s\n",
+               message.room_data.sender_socket_id, message.room_data.receiver_socket_id, message.room_data.sender_username, message.room_data.receiver_username);
+
+        // Create a new thread to handle the room associated with the message
+        pthread_t room_thread;
+        pthread_create(&room_thread, NULL, init_game, (void *)&message.room_data);
+    }
+}
+
+void init_game(void *arg)
+{
+    Room *room = (Room *)arg;
+
+    pthread_mutex_lock(&socket_mutex);
+    in_game[room->sender_socket_id] = 1;
+    in_game[room->receiver_socket_id] = 1;
+    pthread_cond_broadcast(&cond);
+    pthread_mutex_unlock(&socket_mutex);
+
+    sleep(100000000);
+
+    pthread_mutex_lock(&socket_mutex);
+    in_game[room->sender_socket_id] = 0;
+    in_game[room->receiver_socket_id] = 0;
+    pthread_cond_broadcast(&cond);
+    pthread_mutex_unlock(&socket_mutex);
+};
+
+// ------------------- HANDLE APIs --------------------
+
+void *handle_apis(void *arg)
 {
     int client_socket = *(int *)arg;
     char send_message[STRING_LENGTH];
@@ -67,13 +131,48 @@ void *api(void *arg)
 
     printf("Client %d request connect\n", client_socket);
     send_with_error_handling(client_socket, send_message, int_to_string(CONNECTED_SUCCESSFULLY), "Send message failed");
-    while (recv_with_error_handling(
-        client_socket,
-        recv_message,
-        sizeof(recv_message),
-        "Error receiving data from the client"))
+
+    fd_set read_fds;
+    struct timeval tv;
+    int retval;
+
+    while (1)
     {
-        router(client_socket, recv_message);
+        FD_ZERO(&read_fds);
+        FD_SET(client_socket, &read_fds);
+
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+
+        retval = select(client_socket + 1, &read_fds, NULL, NULL, &tv);
+
+        if (retval == 0)
+        {
+            // Check if the client is currently in a game
+            pthread_mutex_lock(&socket_mutex);
+            while (in_game[client_socket])
+            {
+                printf("IN game %d %d\n", in_game[client_socket], client_socket);
+                // Wait here if the client is in a game
+                pthread_cond_wait(&cond, &socket_mutex);
+            }
+            pthread_mutex_unlock(&socket_mutex);
+        }
+
+        if (retval == -1)
+        {
+            perror("select()");
+            break;
+        }
+
+        if (FD_ISSET(client_socket, &read_fds))
+        {
+            if (!recv_with_error_handling(client_socket, recv_message, sizeof(recv_message), "Error receiving data from the client"))
+            {
+                break;
+            }
+            router(client_socket, recv_message);
+        }
     }
 
     delete_session_by_socket_id(client_socket);

@@ -1,6 +1,6 @@
 #include "auth.h"
 
-void signUp(int socket)
+void sign_up(int socket)
 {
   char username[STRING_LENGTH];
   char buffer[STRING_LENGTH];

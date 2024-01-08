@@ -11,18 +11,29 @@ void challenge_router(int client_socket, const char *message)
 
     if (strcmp(keyword, "SEND") == 0)
     {
-        // Send a challenge
         send_challenge(client_socket, parameter);
+        print_challenge_list();
     }
-    else if (strcmp(keyword, "DELETE") == 0)
+    else if (strcmp(keyword, "CANCEL") == 0)
     {
-        // Send a challenge
-        delete_challenge(client_socket, parameter);
+        handle_cancel_challenge(client_socket, parameter);
+        print_challenge_list();
     }
     else if (strcmp(keyword, "LIST") == 0)
     {
-        // Send a challenge
         get_challenged_list(client_socket);
+        print_challenge_list();
+    }
+    else if (strcmp(keyword, "REJECT") == 0)
+    {
+        handle_reject_challenge(client_socket, parameter);
+    }
+    else if (strcmp(keyword, "ACCEPT") == 0)
+    {
+        handle_accept_challenge(client_socket, parameter);
+        printf_room_list();
+        printf("\n\n");
+        print_challenge_list();
     }
     else
     {
@@ -30,33 +41,60 @@ void challenge_router(int client_socket, const char *message)
     }
 }
 
+// --------------------------- Services ---------------------------
+
 void get_challenged_list(int client_socket)
 {
-    char buffer[STRING_LENGTH];
+    Challenge *result_head = NULL;
+    Challenge *result_tail = NULL;
 
-    Challenge *challenge_list = find_challenge_by_receiver_socket_id(client_socket);
-    char response[STRING_LENGTH] = "SUCCESS ";
-
-    if (challenge_list == NULL)
+    // Traverse the linked list
+    pthread_mutex_lock(&mutex);
+    Challenge *current = challenge_list;
+    while (current != NULL)
     {
-        send_with_error_handling(client_socket,
-                                 response,
-                                 response,
-                                 "Send challenged list error");
-        return;
-    }
-    // Append usernames to the user_list string
-    while (challenge_list != NULL)
-    {
-        strcat(response, challenge_list->sender_username);
-        strcat(response, " "); // Add a space to separate usernames
-        challenge_list = challenge_list->next;
+        // Check if the element satisfies the condition
+        if (current->receiver_socket_id == client_socket)
+        {
+            // Create a copy of the element to add to the result list
+            Challenge *new_challenge = (Challenge *)malloc(sizeof(Challenge));
+            memcpy(new_challenge, current, sizeof(Challenge));
+            new_challenge->next = NULL;
+
+            // If the result list is not initialized, initialize it
+            if (result_head == NULL)
+            {
+                result_head = new_challenge;
+                result_tail = new_challenge;
+            }
+            else
+            {
+                // Add the element to the end of the result list
+                result_tail->next = new_challenge;
+                result_tail = new_challenge;
+            }
+        }
+
+        current = current->next;
     }
 
-    // Unlock the mutex after the critical section
     pthread_mutex_unlock(&mutex);
 
-    // Send the list of logged-in users to the client
+    char buffer[STRING_LENGTH];
+    char response[STRING_LENGTH] = "SUCCESS ";
+    current = result_head;
+
+    while (current != NULL)
+    {
+        if (current->receiver_socket_id == client_socket)
+        {
+            strcat(response, current->sender_username);
+            strcat(response, " "); // Add a space to separate usernames
+        }
+
+        current = current->next;
+    }
+
     send_with_error_handling(client_socket,
                              buffer,
                              response,
@@ -80,6 +118,16 @@ void send_challenge(int client_socket, const char *parameter)
             client_socket,
             buffer,
             "ERROR The enemy are not online",
+            "Send message failed");
+        return;
+    }
+
+    if (enemy_session->socket_id == client_socket)
+    {
+        send_with_error_handling(
+            client_socket,
+            buffer,
+            "ERROR You can't challenge yourself",
             "Send message failed");
         return;
     }
@@ -116,24 +164,192 @@ void send_challenge(int client_socket, const char *parameter)
     return;
 }
 
+void handle_cancel_challenge(int client_socket, char *enemy_username)
+{
+    char buffer[STRING_LENGTH];
+
+    // Lock the mutex before accessing shared data
+    pthread_mutex_lock(&mutex);
+
+    Challenge *current = challenge_list;
+    Challenge *prev = NULL;
+
+    while (current != NULL && current->sender_socket_id != client_socket &&
+           strcmp(current->receiver_username, enemy_username) != 0)
+    {
+        prev = current;
+        current = current->next;
+    }
+
+    if (current != NULL)
+    {
+        if (prev == NULL)
+        {
+            challenge_list = current->next;
+        }
+        else
+        {
+            prev->next = current->next;
+        }
+        free(current);
+        send_with_error_handling(
+            client_socket,
+            buffer,
+            "SUCCESS Cancel challenge success",
+            "Send message failed");
+    }
+    else
+    {
+        send_with_error_handling(
+            client_socket,
+            buffer,
+            "ERROR Cancel challenge failed",
+            "Send message failed");
+    }
+
+    pthread_mutex_unlock(&mutex);
+}
+
+void handle_reject_challenge(int client_socket, char *sender_username)
+{
+    char buffer[STRING_LENGTH];
+
+    pthread_mutex_lock(&mutex);
+
+    // ---------------------------- Remove challenge ----------------------------
+    Challenge *current = challenge_list;
+    Challenge *prev = NULL;
+
+    while (current != NULL &&
+           (current->receiver_socket_id != client_socket ||
+            strcmp(current->sender_username, sender_username) != 0))
+    {
+        prev = current;
+        current = current->next;
+    }
+    // Challenge not existed
+    if (current == NULL)
+    {
+        send_with_error_handling(client_socket,
+                                 buffer,
+                                 "ERROR This challenge has been canceled or does not exist",
+                                 "Send error");
+        pthread_mutex_unlock(&mutex);
+        return;
+    }
+    // Remove challenge
+    if (prev == NULL)
+    {
+        // The challenge to be removed is at the beginning of the list
+        challenge_list = current->next;
+    }
+    else
+    {
+        // The challenge to be removed is not at the beginning of the list
+        prev->next = current->next;
+    }
+    int sender_socket_id = current->sender_socket_id;
+    free(current);
+    pthread_mutex_unlock(&mutex);
+
+    // Notification to client
+    send_with_error_handling(client_socket,
+                             buffer,
+                             "SUCCESS Cancel challenge successfully",
+                             "Send error");
+
+    send_with_error_handling(sender_socket_id,
+                             buffer,
+                             "ERROR Enemy reject challenge",
+                             "Send error");
+}
+
+void handle_accept_challenge(int client_socket, char *sender_username)
+{
+    char buffer[STRING_LENGTH];
+    pthread_mutex_lock(&mutex);
+    Challenge *current = challenge_list;
+    Challenge *prev = NULL;
+
+    while (current != NULL)
+    {
+        if ((current->receiver_socket_id == client_socket) &&
+            strcmp(current->sender_username, sender_username) == 0)
+        {
+            // Challenge found, break out of the loop
+            break;
+        }
+
+        prev = current;
+        current = current->next;
+    }
+
+    if (current == NULL)
+    {
+        // Challenge not existed
+        pthread_mutex_unlock(&mutex);
+        send_with_error_handling(client_socket,
+                                 buffer,
+                                 "ERROR This challenge not existed",
+                                 "Send error");
+        return;
+    }
+
+    // Remove challenge from the challenge_list
+    if (prev == NULL)
+    {
+        // The challenge to be removed is at the beginning of the list
+        challenge_list = current->next;
+    }
+    else
+    {
+        // The challenge to be removed is not at the beginning of the list
+        prev->next = current->next;
+    }
+
+    pthread_mutex_unlock(&mutex);
+
+    // Add users to the room
+    send_to_queue(add_room(current->sender_socket_id,
+                           current->receiver_socket_id,
+                           current->sender_username,
+                           current->receiver_username));
+
+    // Send success message to the client
+    send_with_error_handling(client_socket,
+                             buffer,
+                             "SUCCESS Start game",
+                             "Send error");
+
+    send_with_error_handling(current->sender_socket_id,
+                             buffer,
+                             "SUCCESS Start game",
+                             "Send error");
+
+    // Free the memory of the removed challenge node
+    free(current);
+}
+
+// --------------------------- Support function ---------------------------------
+
 void add_challenge(
     int sender_socket_id,
     int receiver_socket_id,
     char *sender_username,
     char *receiver_username)
 {
-    if (find_challenge(sender_socket_id, receiver_socket_id) == NULL)
-    {
-        pthread_mutex_lock(&mutex);
-        Challenge *new_challenge = (Challenge *)malloc(sizeof(Challenge));
-        new_challenge->sender_socket_id = sender_socket_id;
-        new_challenge->receiver_socket_id = receiver_socket_id;
-        strcpy(new_challenge->sender_username, sender_username);
-        strcpy(new_challenge->receiver_username, receiver_username);
-        new_challenge->next = challenge_list;
-        challenge_list = new_challenge;
-        pthread_mutex_unlock(&mutex);
-    }
+    if (find_challenge(sender_socket_id, receiver_socket_id) != NULL)
+        return;
+    pthread_mutex_lock(&mutex);
+    Challenge *new_challenge = (Challenge *)malloc(sizeof(Challenge));
+    new_challenge->sender_socket_id = sender_socket_id;
+    new_challenge->receiver_socket_id = receiver_socket_id;
+    strcpy(new_challenge->sender_username, sender_username);
+    strcpy(new_challenge->receiver_username, receiver_username);
+    new_challenge->next = challenge_list;
+    challenge_list = new_challenge;
+    printf("Add nè: %s\n", challenge_list->sender_username);
+    pthread_mutex_unlock(&mutex);
 }
 
 Challenge *find_challenge(int sender_socket_id, int receiver_socket_id)
@@ -143,8 +359,8 @@ Challenge *find_challenge(int sender_socket_id, int receiver_socket_id)
 
     while (current != NULL)
     {
-        if (current->receiver_socket_id == receiver_socket_id &&
-            current->sender_socket_id == sender_socket_id)
+        if ((current->receiver_socket_id == receiver_socket_id) &&
+            (current->sender_socket_id == sender_socket_id))
         {
             // Return a pointer to the challenge if the socket_id matches
             pthread_mutex_unlock(&mutex);
@@ -159,69 +375,26 @@ Challenge *find_challenge(int sender_socket_id, int receiver_socket_id)
     return NULL;
 }
 
-Challenge *find_challenge_by_receiver_socket_id(int receiver_socket_id)
+void print_challenge_list()
 {
-    pthread_mutex_lock(&mutex);
     Challenge *current = challenge_list;
 
+    // Traverse the linked list and print sender and receiver names
     while (current != NULL)
     {
-        if (current->receiver_socket_id == receiver_socket_id)
-        {
-            // Return a pointer to the challenge if the socket_id matches
-            pthread_mutex_unlock(&mutex);
-            return current;
-        }
-
+        printf("Sender: %s, Receiver: %s\n", current->sender_username, current->receiver_username);
         current = current->next;
     }
-
-    // Return NULL if not found
-    pthread_mutex_unlock(&mutex);
-    return NULL;
 }
 
-void delete_challenge(int client_socket, const char *parameter)
+void printf_room_list()
 {
-    // Lock the mutex before accessing shared data
-    pthread_mutex_lock(&mutex);
+    Room *current = room_list;
 
-    // Critical section: update shared data (e.g., session_list)
-    Session *current = session_list;
-    Session *prev = NULL;
-
-    // Find the session with the given socket_id
-    while (current != NULL && strcmp(current->client_username, parameter) != 0)
+    // Traverse the linked list and print sender and receiver names
+    while (current != NULL)
     {
-        prev = current;
+        printf("Sender: %s, Receiver: %s\n", current->sender_username, current->receiver_username);
         current = current->next;
     }
-
-    // If the session is found, remove it from the linked list
-    if (current != NULL)
-    {
-        if (prev == NULL)
-        {
-            // The session is the first in the list
-            session_list = current->next;
-        }
-        else
-        {
-            // The session is in the middle or at the end of the list
-            prev->next = current->next;
-        }
-
-        // Free the memory for the deleted session
-        free(current);
-    }
-
-    // Unlock the mutex after critical section
-    char buffer[STRING_LENGTH];
-    send_with_error_handling(
-        client_socket,
-        buffer,
-        "SUCCESS Remove challenge successfully",
-        "Send message failed");
-
-    pthread_mutex_unlock(&mutex);
-};
+}

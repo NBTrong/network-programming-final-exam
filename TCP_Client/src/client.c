@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
         switch (choice)
         {
         case 1:
-            signUp(client_socket);
+            sign_up(client_socket);
             break;
         case 2:
             login(client_socket);

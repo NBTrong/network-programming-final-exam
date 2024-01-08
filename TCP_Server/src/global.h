@@ -6,9 +6,16 @@
 
 #define STRING_LENGTH 100
 
+#define MAX_CLIENTS 100
+
 extern char currentUser[STRING_LENGTH];
 
+extern int msgid;
+
 extern pthread_mutex_t mutex;
+extern pthread_mutex_t socket_mutex;
+extern pthread_cond_t cond;
+extern int in_game[MAX_CLIENTS];
 
 enum LoginStatus
 {

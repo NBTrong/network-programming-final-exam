@@ -23,6 +23,10 @@ void challenge(int socket)
       buffer,
       sizeof(buffer),
       "Error receiving data from the client");
+  if (processDataFromResponse(buffer) == NULL)
+  {
+    return;
+  }
 
   printf("Recv from server: %s \n", buffer);
 
@@ -46,6 +50,14 @@ void challenge(int socket)
 
       // Process data received from the server
       printf("Received from server: %s\n", buffer);
+      if (strncmp(buffer, "SUCCESS", 7) != 0)
+      {
+        return;
+      }
+      else
+      {
+        game(socket);
+      }
     }
 
     if (FD_ISSET(STDIN_FILENO, &read_fds))
@@ -55,7 +67,7 @@ void challenge(int socket)
       input(&choice, "int");
 
       // Remove challenge
-      sprintf(message, "CHALLENGE DELETE %s", enemy_username);
+      sprintf(message, "CHALLENGE CANCEL %s", enemy_username);
       send_with_error_handling(
           socket,
           buffer,
@@ -77,16 +89,102 @@ void challenge(int socket)
 
 void get_challenged_list(int client_socket)
 {
+  int choice = 0;
   char buffer[STRING_LENGTH];
-  send_with_error_handling(
-      client_socket,
-      buffer,
-      "CHALLENGE LIST",
-      "Send message login status error");
-  recv_with_error_handling(
-      client_socket,
-      buffer,
-      sizeof(buffer),
-      "Error receiving data from the client");
-  printf("Recv from server: %s\n", buffer);
+  char enemy[STRING_LENGTH];
+  char message[STRING_LENGTH * 2];
+  do
+  {
+    send_with_error_handling(
+        client_socket,
+        buffer,
+        "CHALLENGE LIST",
+        "Send message login status error");
+    recv_with_error_handling(
+        client_socket,
+        buffer,
+        sizeof(buffer),
+        "Error receiving data from the client");
+    char *data = processDataFromResponse(buffer);
+    if (data != NULL)
+    {
+      // Create a copy of the input string that can be modified
+      char userListCopy[STRING_LENGTH];
+      strncpy(userListCopy, data, sizeof(userListCopy));
+
+      char *token = strtok(userListCopy, " "); // Split the first username
+      int userCount = 0;
+
+      while (token != NULL)
+      {
+        printf("%s challenging\n", token);
+        token = strtok(NULL, " ");
+        userCount++;
+      }
+
+      // Check if no users are online and replace with a space if needed
+      if (userCount == 0)
+      {
+        printf("No users challenging\n");
+      }
+    }
+
+    printf("Menu:\n");
+    printf("1. Challenge Accept\n");
+    printf("2. Challenge Reject\n");
+    printf("3. Quit\n");
+    printf("Enter your choice (1, 2, or 3): ");
+    input(&choice, "int");
+
+    switch (choice)
+    {
+    case 1:
+      // Challenge Accept
+      printf("Enter the username of the opponent you want to challenge: ");
+      input(enemy, "string");
+      snprintf(message, sizeof(message), "CHALLENGE ACCEPT %s", enemy);
+      send_with_error_handling(
+          client_socket,
+          buffer,
+          message,
+          "Send message login status error");
+      recv_with_error_handling(
+          client_socket,
+          buffer,
+          sizeof(buffer),
+          "Error receiving data from the client");
+      printf("Recv from server: %s\n", buffer);
+      game(client_socket);
+      break;
+
+    case 2:
+      // Challenge Accept
+      printf("Enter the username of the opponent you want to reject: ");
+      input(enemy, "string");
+      snprintf(message, sizeof(message), "CHALLENGE REJECT %s", enemy);
+      send_with_error_handling(
+          client_socket,
+          buffer,
+          message,
+          "Send message login status error");
+      recv_with_error_handling(
+          client_socket,
+          buffer,
+          sizeof(buffer),
+          "Error receiving data from the client");
+      printf("Recv from server: %s\n", buffer);
+      break;
+
+    case 3:
+      // Quit
+      printf("Exiting the program.\n");
+      return;
+
+    default:
+      // Invalid choice
+      printf("Invalid choice. Please enter 1, 2, or 3.\n");
+      return;
+    }
+
+  } while (choice != 3);
 };

@@ -26,6 +26,6 @@ void login(int socket);
  */
 void logout(int socket);
 
-void signUp(int socket);
+void sign_up(int socket);
 
 #endif // AUTH_H
