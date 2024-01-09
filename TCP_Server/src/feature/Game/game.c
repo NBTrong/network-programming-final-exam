@@ -136,6 +136,27 @@ int check_board(char board[][3], int last_move)
 
 void game(int player1_socket, int player2_socket, char *player1_username, char *player2_username)
 {
+    // Log game
+    int log[8] = {0};
+    int winner = -1;
+
+    // Time start game
+    time_t start_time;
+    time(&start_time);
+
+    // IP players
+    struct sockaddr_in player_addr;
+    socklen_t addr_size = sizeof(player_addr);
+    char player1_ip[INET_ADDRSTRLEN];
+    char player2_ip[INET_ADDRSTRLEN];
+
+    getpeername(player1_socket, (struct sockaddr *)&player_addr, &addr_size);
+    inet_ntop(AF_INET, &player_addr.sin_addr, player1_ip, INET_ADDRSTRLEN);
+
+    getpeername(player2_socket, (struct sockaddr *)&player_addr, &addr_size);
+    inet_ntop(AF_INET, &player_addr.sin_addr, player2_ip, INET_ADDRSTRLEN);
+
+    // Init game
     char buffer[STRING_LENGTH];
     char board[3][3] = {{' ', ' ', ' '},
                         {' ', ' ', ' '},
@@ -215,7 +236,8 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                 buffer,
                 "WIN",
                 "Send message failed");
-            printf("Player %d won.\n", player_turn);
+            printf("Player %d won.\n", (player_turn + 1) % 2);
+            winner = (player_turn + 1) % 2;
         }
         else if (move == 10)
         {
@@ -232,6 +254,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                 "WIN",
                 "Send message failed");
             printf("Player %d won.\n", player_turn);
+            winner = (player_turn + 1) % 2;
         }
         else
         {
@@ -256,19 +279,68 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                     "LSE",
                     "Send message failed");
                 printf("Player %d won.\n", player_turn);
+                winner = player_turn;
             }
             else if (turn_count == 8)
             {
                 printf("Draw.\n");
                 send_all(players_socket[player_turn], players_socket[(player_turn + 1) % 2], "DRW");
                 game_over = 1;
+                winner = -1;
             }
 
             prev_player_turn = player_turn;
             player_turn = (player_turn + 1) % 2;
+            log[turn_count] = move;
             turn_count++;
         }
     }
 
+    // Print to log file
+    time_t end_time;
+    struct tm *tm_info;
+    char time_str[20];
+    time(&end_time);
+    tm_info = localtime(&end_time);
+    strftime(time_str, 20, "%Y%m%d_%H%M%S", tm_info);
+
+    // Create log file
+    char log_filename[100];
+    snprintf(log_filename, 100, "./TCP_Server/logs/%s_%s_%s.log", time_str, player1_username, player2_username);
+
+    // Open file
+    FILE *log_file = fopen(log_filename, "w");
+    if (log_file == NULL)
+    {
+        perror("Error opening log file");
+        return;
+    }
+
+    // Print to file
+    fprintf(log_file, "Game started at: %s", ctime(&start_time));
+    fprintf(log_file, "Game ended at: %s", ctime(&end_time));
+    fprintf(log_file, "Player 1: %s, IP: %s\n", player1_username, player1_ip);
+    fprintf(log_file, "Player 2: %s, IP: %s\n", player2_username, player2_ip);
+    for (int i = 0; i < turn_count; ++i)
+    {
+        if (i % 2 == 0)
+        {
+            fprintf(log_file, "%s move %d\n", player1_username, log[i]);
+        }
+        else
+        {
+            fprintf(log_file, "%s move %d\n", player2_username, log[i]);
+        }
+    }
+    if (winner == -1)
+    {
+        fprintf(log_file, "Winner is: Draw\n");
+    }
+    else
+    {
+        fprintf(log_file, "Winner is: %s\n", players_username[winner]);
+    }
+
+    fclose(log_file);
     printf("Game over.\n");
 }

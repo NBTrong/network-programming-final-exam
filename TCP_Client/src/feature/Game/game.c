@@ -37,7 +37,7 @@ void take_turn(int sockfd)
   {
     printf("Enter 1-9 to make a move, or 10 to accept defeat and cancel the game: ");
     fgets(buffer, 10, stdin);
-    int move = buffer[0] - '0';
+    int move = convert_string_to_number(buffer);
     if (move <= 10 && move >= 1)
     {
       printf("\n");

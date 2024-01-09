@@ -1,10 +1,10 @@
-tungbt 1 1
-admin 1 2
+tungbt 1 4
+admin 1 -1
 ductq 0 3
 batrong 1 4
-badung 1 -1
+badung 1 5
 new_account 1 6
-nbtrong 1 13
+nbtrong 1 7
 hehe 1 8
 hohohoho 1 9
 hihihhihihih 1 10
@@ -12,3 +12,5 @@ trongdeptrai 1 11
 quadeptrai 1 12
 hohohohohoho 1 13
 thanhtu 1 14
+
+
