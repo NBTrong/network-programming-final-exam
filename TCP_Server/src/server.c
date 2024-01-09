@@ -15,6 +15,7 @@
 #include "./feature/Auth/auth.h"
 #include "./feature/Session/session.h"
 #include "./feature/Challenge/challenge.h"
+#include "./feature/Game/game.h"
 
 void router(int client_socket, const char *message);
 void *handle_apis(void *arg);
@@ -109,7 +110,10 @@ void init_game(void *arg)
     pthread_cond_broadcast(&cond);
     pthread_mutex_unlock(&socket_mutex);
 
-    game(room->sender_socket_id, room->receiver_socket_id);
+    game(room->sender_socket_id,
+         room->receiver_socket_id,
+         room->sender_username,
+         room->receiver_username);
 
     remove_room(room->sender_socket_id,
                 room->receiver_socket_id,
@@ -168,7 +172,6 @@ void *handle_apis(void *arg)
 
         if (retval == -1)
         {
-            perror("select()");
             break;
         }
 

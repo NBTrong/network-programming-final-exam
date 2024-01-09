@@ -137,8 +137,6 @@ int check_rank_difference(const char *username1, const char *username2)
     }
 
     char line[MAX_LINE_LENGTH];
-    char test0[STRING_LENGTH];
-    int test1, test2;
     Player players[MAX_PLAYERS];
     int num_players = 0;
 
@@ -170,6 +168,69 @@ int check_rank_difference(const char *username1, const char *username2)
     fclose(file);
 
     return rank_difference;
+}
+
+void update_scores(const char *winner_username, const char *loser_username)
+{
+    FILE *file = fopen("./TCP_Server/database/account.txt", "r+");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[MAX_LINE_LENGTH];
+    Player players[MAX_PLAYERS];
+    int num_players = 0;
+
+    // Read players from the file
+    while (fscanf(file, "%s %d %d", players[num_players].username, &players[num_players].is_blocked, &players[num_players].score) == 3)
+    {
+        num_players++;
+        if (num_players >= MAX_PLAYERS)
+        {
+            fprintf(stderr, "Too many players in the file. Increase MAX_PLAYERS.\n");
+            fclose(file);
+            return;
+        }
+    }
+
+    // Find the winner and loser in the player array
+    int winner_index = -1, loser_index = -1;
+    for (int i = 0; i < num_players; i++)
+    {
+        if (strcmp(players[i].username, winner_username) == 0)
+        {
+            winner_index = i;
+        }
+        else if (strcmp(players[i].username, loser_username) == 0)
+        {
+            loser_index = i;
+        }
+    }
+
+    if (winner_index == -1 || loser_index == -1)
+    {
+        fprintf(stderr, "Winner or loser not found in the file.\n");
+        fclose(file);
+        return;
+    }
+
+    // Update scores
+    players[winner_index].score += 3;
+    players[loser_index].score -= 3;
+
+    // Move the file pointer to the beginning of the file
+    fseek(file, 0, SEEK_SET);
+
+    // Write the updated scores back to the file
+    for (int i = 0; i < num_players; i++)
+    {
+        fprintf(file, "%s %d %d\n", players[i].username, players[i].is_blocked, players[i].score);
+    }
+
+    // Close the file before returning
+    fclose(file);
 }
 
 void send_challenge(int client_socket, const char *parameter)

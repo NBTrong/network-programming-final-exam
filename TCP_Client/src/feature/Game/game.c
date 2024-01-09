@@ -35,10 +35,10 @@ void take_turn(int sockfd)
 
   while (1)
   {
-    printf("Enter 0-8 to make a move, or 9 for number of active players: ");
+    printf("Enter 1-9 to make a move, or 10 to accept defeat and cancel the game: ");
     fgets(buffer, 10, stdin);
     int move = buffer[0] - '0';
-    if (move <= 9 && move >= 0)
+    if (move <= 10 && move >= 1)
     {
       printf("\n");
       send_with_error_handling(

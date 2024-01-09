@@ -8,7 +8,7 @@
 #define MAX_CLIENTS 100
 
 #define MAX_LINE_LENGTH 1000
-#define MAX_PLAYERS 100
+#define MAX_PLAYERS 1000
 
 extern char currentUser[STRING_LENGTH];
 extern int msgid;

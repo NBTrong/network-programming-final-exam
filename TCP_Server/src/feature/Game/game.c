@@ -38,7 +38,7 @@ int convert_string_to_number(const char *str)
     // Check if the conversion was unsuccessful
     if (result == 0 && str[0] != '0')
     {
-        return -2; // Conversion unsuccessful
+        return -1; // Conversion unsuccessful
     }
 
     return result; // Return the converted number
@@ -53,23 +53,27 @@ int get_player_move(int socket)
         "TRN",
         "Send message failed");
 
-    recv_with_error_handling(socket,
-                             buffer,
-                             sizeof(buffer),
-                             "Error receiving data from the client");
+    if (!recv_with_error_handling(socket,
+                                  buffer,
+                                  sizeof(buffer),
+                                  "Error receiving data from the client"))
+    {
+        return 0;
+    }
     return convert_string_to_number(buffer);
 }
 
 int check_move(char board[][3], int move, int player_id)
 {
-    if ((board[move / 3][move % 3] == ' '))
+    int _move = move - 1;
+    if ((board[_move / 3][_move % 3] == ' '))
     {
-        printf("[DEBUG] Player %d's move was valid.\n", player_id);
+        printf("Player %d's move was valid.\n", player_id);
         return 1;
     }
     else
     {
-        printf("[DEBUG] Player %d's move was invalid.\n", player_id);
+        printf("Player %d's move was invalid.\n", player_id);
         return 0;
     }
 }
@@ -78,12 +82,12 @@ void update_board(char board[][3], int move, int player_id)
 {
     board[move / 3][move % 3] = player_id ? 'X' : 'O';
 
-    printf("[DEBUG] Board updated.\n");
+    printf("Board updated.\n");
 }
 
 void send_update(int *cli_sockfd, int move, int player_id)
 {
-    printf("[DEBUG] Sending update...\n");
+    printf("Sending update...\n");
 
     send_all(cli_sockfd[0], cli_sockfd[1], "UPD");
 
@@ -91,46 +95,46 @@ void send_update(int *cli_sockfd, int move, int player_id)
 
     send_all(cli_sockfd[0], cli_sockfd[1], int_to_string(move));
 
-    printf("[DEBUG] Update sent.\n");
+    printf("Update sent.\n");
 }
 
 int check_board(char board[][3], int last_move)
 {
-    printf("[DEBUG] Checking for a winner...\n");
+    printf("Checking for a winner...\n");
 
     int row = last_move / 3;
     int col = last_move % 3;
 
     if (board[row][0] == board[row][1] && board[row][1] == board[row][2])
     {
-        printf("[DEBUG] Win by row %d.\n", row);
+        printf("Win by row %d.\n", row);
         return 1;
     }
     else if (board[0][col] == board[1][col] && board[1][col] == board[2][col])
     {
-        printf("[DEBUG] Win by column %d.\n", col);
+        printf("Win by column %d.\n", col);
         return 1;
     }
     else if (!(last_move % 2))
     {
         if ((last_move == 0 || last_move == 4 || last_move == 8) && (board[1][1] == board[0][0] && board[1][1] == board[2][2]))
         {
-            printf("[DEBUG] Win by backslash diagonal.\n");
+            printf("Win by backslash diagonal.\n");
             return 1;
         }
         if ((last_move == 2 || last_move == 4 || last_move == 6) && (board[1][1] == board[0][2] && board[1][1] == board[2][0]))
         {
-            printf("[DEBUG] Win by frontslash diagonal.\n");
+            printf("Win by frontslash diagonal.\n");
             return 1;
         }
     }
 
-    printf("[DEBUG] No winner, yet.\n");
+    printf("No winner, yet.\n");
 
     return 0;
 }
 
-void game(int player1_socket, int player2_socket)
+void game(int player1_socket, int player2_socket, char *player1_username, char *player2_username)
 {
     char buffer[STRING_LENGTH];
     char board[3][3] = {{' ', ' ', ' '},
@@ -156,6 +160,7 @@ void game(int player1_socket, int player2_socket)
     draw_board(board);
 
     int players_socket[2] = {player1_socket, player2_socket};
+    char *players_username[2] = {player1_username, player2_username};
 
     int prev_player_turn = 1;
     int player_turn = 0;
@@ -176,11 +181,18 @@ void game(int player1_socket, int player2_socket)
         while (!valid)
         {
             move = get_player_move(players_socket[player_turn]);
-            if (move == -1)
-                break;
-            printf("Player %d played position %d\n", player_turn, move);
 
-            valid = check_move(board, move, player_turn);
+            // 10 là client bỏ cuộc
+            // 0 là client disconnect
+            if (move == 10 || move == 0)
+                break;
+
+            // -1 là client gửi lên không đúng định dạng --> valid = 0 (không thay đổi)
+            if (move != -1)
+            {
+                printf("Player %d played position %d\n", player_turn, move);
+                valid = check_move(board, move, player_turn);
+            }
 
             if (!valid)
             {
@@ -193,22 +205,46 @@ void game(int player1_socket, int player2_socket)
             }
         }
 
-        if (move == -1)
+        if (move == 0)
         {
             printf("Player disconnected.\n");
-            break;
+            game_over = 1;
+            update_scores(players_username[(player_turn + 1) % 2], players_username[player_turn]);
+            send_with_error_handling(
+                players_socket[(player_turn + 1) % 2],
+                buffer,
+                "WIN",
+                "Send message failed");
+            printf("Player %d won.\n", player_turn);
+        }
+        else if (move == 10)
+        {
+            game_over = 1;
+            update_scores(players_username[(player_turn + 1) % 2], players_username[player_turn]);
+            send_with_error_handling(
+                players_socket[player_turn],
+                buffer,
+                "LSE",
+                "Send message failed");
+            send_with_error_handling(
+                players_socket[(player_turn + 1) % 2],
+                buffer,
+                "WIN",
+                "Send message failed");
+            printf("Player %d won.\n", player_turn);
         }
         else
         {
-            update_board(board, move, player_turn);
-            send_update(players_socket, move, player_turn);
+            update_board(board, move - 1, player_turn);
+            send_update(players_socket, move - 1, player_turn);
 
             draw_board(board);
 
-            game_over = check_board(board, move);
+            game_over = check_board(board, move - 1);
 
             if (game_over == 1)
             {
+                update_scores(players_username[player_turn], players_username[(player_turn + 1) % 2]);
                 send_with_error_handling(
                     players_socket[player_turn],
                     buffer,

@@ -1,5 +1,5 @@
-#ifndef CHALLENGE_H
-#define CHALLENGE_H
+#ifndef GAME_H
+#define GAME_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +23,6 @@ typedef struct
   int current_player;
 } Game;
 
-void game(int player1_socket, int player2_socket);
+void game(int player1_socket, int player2_socket, char *player1_username, char *player2_username);
 
 #endif
