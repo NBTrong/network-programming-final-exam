@@ -49,4 +49,6 @@ void logout(int client_socket);
 
 void sign_up(int client_socket, const char *username);
 
+int auth_middleware(int client_socket);
+
 #endif

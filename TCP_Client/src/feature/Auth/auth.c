@@ -22,7 +22,7 @@ void sign_up(int socket)
       buffer,
       sizeof(buffer),
       "Error receiving data from the client");
-  printStatusMessage(buffer);
+  handle_response(buffer);
 }
 
 void login(int socket)
@@ -47,7 +47,7 @@ void login(int socket)
       buffer,
       sizeof(buffer),
       "Error receiving data from the client");
-  printStatusMessage(buffer);
+  handle_response(buffer);
 }
 
 void logout(int socket)
@@ -65,5 +65,5 @@ void logout(int socket)
       buffer,
       sizeof(buffer),
       "Error receiving data from the client");
-  printStatusMessage(buffer);
+  handle_response(buffer);
 }

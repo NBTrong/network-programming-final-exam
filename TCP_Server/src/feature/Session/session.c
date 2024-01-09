@@ -2,7 +2,7 @@
 
 Session *session_list = NULL;
 
-void add_session(int socket_id, const char *client_addr, int port, const char *client_username, int login_status)
+void add_session(int socket_id, const char *client_addr, int port, const char *client_username)
 {
   pthread_mutex_lock(&mutex);
   Session *new_session = (Session *)malloc(sizeof(Session));
@@ -10,7 +10,6 @@ void add_session(int socket_id, const char *client_addr, int port, const char *c
   strcpy(new_session->client_addr, client_addr);
   new_session->port = port;
   strcpy(new_session->client_username, client_username);
-  new_session->login_status = login_status;
 
   new_session->next = session_list;
   session_list = new_session;
@@ -93,8 +92,8 @@ void print_all_sessions()
   // Print each session
   while (current != NULL)
   {
-    printf("%d\t\t%s\t\t%s\t\t%d\n", current->socket_id,
-           current->client_addr, current->client_username, current->login_status);
+    printf("%d\t\t%s\t\t%s\n", current->socket_id,
+           current->client_addr, current->client_username);
     current = current->next;
   }
 
@@ -104,55 +103,40 @@ void print_all_sessions()
 
 void send_all_sessions(int client_socket)
 {
-  int result = check_login_status(client_socket);
-  switch (result)
+  // Lock the mutex before accessing shared data
+  pthread_mutex_lock(&mutex);
+
+  // Critical section: read shared data (e.g., session_list)
+  Session *current = session_list;
+  char user_list[STRING_LENGTH] = "SUCCESS ";
+
+  if (current == NULL)
   {
-  case LOGGED_IN:
-    // Lock the mutex before accessing shared data
-    pthread_mutex_lock(&mutex);
-
-    // Critical section: read shared data (e.g., session_list)
-    Session *current = session_list;
-    char user_list[STRING_LENGTH] = "ONLINE ";
-
-    if (current == NULL)
-    {
-      send_with_error_handling(client_socket,
-                               user_list,
-                               user_list,
-                               "Send user list error");
-      return;
-    }
-    // Append usernames to the user_list string
-    while (current != NULL)
-    {
-      printf("username: %s\n", current->client_username);
-      strcat(user_list, current->client_username);
-      strcat(user_list, " "); // Add a space to separate usernames
-      current = current->next;
-      printf("User list: %s\n", user_list);
-    }
-
-    // Unlock the mutex after the critical section
-    pthread_mutex_unlock(&mutex);
-
-    // Send the list of logged-in users to the client
-    char buffer[STRING_LENGTH];
     send_with_error_handling(client_socket,
-                             buffer,
+                             user_list,
                              user_list,
                              "Send user list error");
-    break;
-  case NOT_LOGGED_IN:
-    send_with_error_handling(
-        client_socket,
-        buffer,
-        int_to_string(NOT_HAVE_ACCESS),
-        "Send message login status error");
-    break;
-  default:
-    break;
+    return;
   }
+  // Append usernames to the user_list string
+  while (current != NULL)
+  {
+    printf("username: %s\n", current->client_username);
+    strcat(user_list, current->client_username);
+    strcat(user_list, " "); // Add a space to separate usernames
+    current = current->next;
+    printf("User list: %s\n", user_list);
+  }
+
+  // Unlock the mutex after the critical section
+  pthread_mutex_unlock(&mutex);
+
+  // Send the list of logged-in users to the client
+  char buffer[STRING_LENGTH];
+  send_with_error_handling(client_socket,
+                           buffer,
+                           user_list,
+                           "Send user list error");
 }
 
 void delete_session_by_socket_id(int socket_id)

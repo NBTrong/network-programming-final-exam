@@ -105,58 +105,50 @@ int connect_server(const char *server_ip_address, int server_port_number)
         buffer,
         sizeof(buffer),
         "Error receiving data from the client");
-    printStatusMessage(buffer);
+    printf("%s\n", handle_response(buffer));
 
     return client_socket;
 }
 
-void printStatusMessage(const char *status)
+char *handle_response(const char *response)
 {
-    int code = atoi(status);
-
-    switch (code)
+    // Check if the response starts with "SUCCESS"
+    if (strncmp(response, "SUCCESS", 7) == 0)
     {
-    case 100:
-        printf("Connection to the service successful.\n");
-        break;
-    case 110:
-        printf("Login successfully.\n");
-        break;
-    case 211:
-        printf("Login failed: Account is locked.\n");
-        break;
-    case 212:
-        printf("Login failed: Account does not exist.\n");
-        break;
-    case 213:
-        printf("Login failed: Account is already logged in on another client.\n");
-        break;
-    case 214:
-        printf("Login failed: You are already logged in.\n");
-        break;
-    case 300:
-        printf("Login failed: Undefined message request type.\n");
-        break;
-    case 120:
-        printf("Post article successful.\n");
-        break;
-    case 221:
-        printf("Cannot use the service, you are not logged in.\n");
-        break;
-    case 130:
-        printf("Logout successful.\n");
-        break;
-    case 410:
-        printf("Account exited, please other username\n");
-        break;
-    case 411:
-        printf("Sign up successfully, please login to use services\n");
-        break;
-    case 511:
-        printf("Get list user successfully\n");
-        break;
-    default:
-        printf("Unknown status code: %d\n", code);
-        break;
+        // If successful, find the position of the first space after "SUCCESS"
+        const char *firstSpace = strchr(response, ' ');
+
+        if (firstSpace != NULL)
+        {
+            // Get the data part after "SUCCESS"
+            const char *dataStart = firstSpace + 1;
+
+            // Calculate the length of the data string
+            size_t dataLength = strlen(dataStart);
+
+            // Allocate memory for the data string and copy the data into it
+            char *data = (char *)malloc(dataLength + 1);
+            strncpy(data, dataStart, dataLength);
+            data[dataLength] = '\0'; // Ensure the string is null-terminated
+            printf("SUCCESS: %s\n", response + 7);
+            return data;
+        }
+        else
+        {
+            printf("SUCCESS: No param\n");
+            return "";
+        }
     }
-};
+    else if (strncmp(response, "ERROR", 5) == 0)
+    {
+        // If it's an error, print the error message and return NULL
+        printf("Error: %s\n", response + 6); // Print the error message after "ERROR"
+        return NULL;
+    }
+    else
+    {
+        // If neither SUCCESS nor ERROR, consider the response invalid
+        printf("Error: Invalid response format\n");
+        return NULL;
+    }
+}

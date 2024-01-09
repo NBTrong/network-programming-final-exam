@@ -5,17 +5,21 @@
 #include <pthread.h>
 
 #define STRING_LENGTH 100
-
 #define MAX_CLIENTS 100
 
 extern char currentUser[STRING_LENGTH];
-
 extern int msgid;
-
 extern pthread_mutex_t mutex;
 extern pthread_mutex_t socket_mutex;
 extern pthread_cond_t cond;
+extern const char *messageCodes[];
 extern int in_game[MAX_CLIENTS];
+
+enum AccountStatus
+{
+  BAN = 0,
+  ACTIVE = 1
+};
 
 enum LoginStatus
 {
@@ -30,34 +34,32 @@ enum LoginStatus
 enum Code
 {
   // Connect server
-  CONNECTED_SUCCESSFULLY = 100,
+  CONNECTED_SUCCESSFULLY,
 
   // Login
-  ACCOUNT_EXISTS_AND_ACTIVE = 110,
-  ACCOUNT_LOCKED = 211,
-  ACCOUNT_NOT_FOUND = 212,
-  ACCOUNT_ALREADY_LOGGED_IN = 214,
-  ACCOUNT_ALREADY_LOGGED_IN_ANOTHER_DEVICE = 213,
+  ACCOUNT_EXISTS_AND_ACTIVE,
+  ACCOUNT_LOCKED,
+  ACCOUNT_NOT_FOUND,
+  ACCOUNT_ALREADY_LOGGED_IN,
+  ACCOUNT_ALREADY_LOGGED_IN_ANOTHER_DEVICE,
 
   // Sign up
-  ACCOUNT_EXITED = 410,
-  SIGN_UP_SUCCESSFULLY = 411,
+  ACCOUNT_EXITED,
+  SIGN_UP_SUCCESSFULLY,
 
   // Get list user online
-  GET_LIST_USER_ONLINE_SUCCESSFULLY = 511,
+  GET_LIST_USER_ONLINE_SUCCESSFULLY,
 
   // Logout
-  LOGOUT_SUCCESSFULLY = 130,
-  UNDEFINED_MESSAGE_TYPE = 300,
+  LOGOUT_SUCCESSFULLY,
+
+  // Error type message
+  UNDEFINED_MESSAGE_TYPE,
 
   // Do not use the service because not logged in
-  NOT_HAVE_ACCESS = 221,
+  NOT_HAVE_ACCESS,
 };
 
-enum AccountStatus
-{
-  BAN = 0,
-  ACTIVE = 1
-};
+const char *get_code_description(enum Code code);
 
 #endif

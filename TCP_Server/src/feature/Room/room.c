@@ -43,6 +43,49 @@ Room *add_room(
   return new_room;
 }
 
+void remove_room(
+    int sender_socket_id,
+    int receiver_socket_id,
+    char *sender_username,
+    char *receiver_username)
+{
+  pthread_mutex_lock(&mutex);
+
+  Room *current = room_list;
+  Room *prev = NULL;
+
+  // Traverse the list to find the room to remove
+  while (current != NULL &&
+         (current->sender_socket_id != sender_socket_id ||
+          current->receiver_socket_id != receiver_socket_id ||
+          strcmp(current->sender_username, sender_username) != 0 ||
+          strcmp(current->receiver_username, receiver_username) != 0))
+  {
+    prev = current;
+    current = current->next;
+  }
+
+  // If room is found, remove it
+  if (current != NULL)
+  {
+    if (prev == NULL)
+    {
+      // If the room to be removed is the head
+      room_list = current->next;
+    }
+    else
+    {
+      // If the room to be removed is not the head
+      prev->next = current->next;
+    }
+
+    // Free memory allocated for the room
+    free(current);
+  }
+
+  pthread_mutex_unlock(&mutex);
+}
+
 void send_to_queue(Room *room)
 {
   struct Message msg;

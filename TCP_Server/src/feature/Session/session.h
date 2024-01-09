@@ -22,7 +22,6 @@ typedef struct Session
   char client_addr[STRING_LENGTH];     // Client's IP address
   int port;                            // Port number for communication
   char client_username[STRING_LENGTH]; // Username associated with the session
-  int login_status;                    // Login status (e.g., LOGGED_IN or NOT_LOGGED_IN)
 
   struct Session *next; // Pointer to the next session in the linked list
 } Session;
@@ -40,7 +39,7 @@ extern Session *session_list; // External variable to store the linked list of s
  * @param client_username The username associated with the session.
  * @param login_status The login status (e.g., LOGGED_IN or NOT_LOGGED_IN).
  */
-void add_session(int socket_id, const char *client_addr, int port, const char *client_username, int login_status);
+void add_session(int socket_id, const char *client_addr, int port, const char *client_username);
 
 /**
  * @brief Free the memory allocated for the session linked list.

@@ -24,9 +24,10 @@ int verify_account(const char *account)
 
     char username[STRING_LENGTH]; // Variable to store the username
     int status;                   // Variable to store the status
+    int point;
 
     // Read and display information from the file
-    while (fscanf(file, "%s %d", username, &status) == 2)
+    while (fscanf(file, "%s %d %d", username, &status, &point) == 3)
     {
         // Banned account
         if (strcmp(account, username) == 0 && status == BAN)
@@ -60,8 +61,9 @@ int check_account_existence(const char *username)
     {
         char storedUsername[STRING_LENGTH];
         int status;
+        int point;
 
-        if (sscanf(line, "%s %d", storedUsername, &status) == 2)
+        if (sscanf(line, "%s %d %d", storedUsername, &status, &point) == 3)
         {
             if (strcmp(username, storedUsername) == 0)
             {
@@ -85,7 +87,7 @@ void sign_up(int client_socket, const char *username)
         send_with_error_handling(
             client_socket,
             buffer,
-            int_to_string(ACCOUNT_ALREADY_LOGGED_IN),
+            get_code_description(ACCOUNT_ALREADY_LOGGED_IN),
             "Send message login status error");
         return;
     }
@@ -96,7 +98,7 @@ void sign_up(int client_socket, const char *username)
         send_with_error_handling(
             client_socket,
             buffer,
-            int_to_string(ACCOUNT_EXITED),
+            get_code_description(ACCOUNT_EXITED),
             "Send message login status error");
         return;
     }
@@ -108,11 +110,11 @@ void sign_up(int client_socket, const char *username)
         exit(EXIT_FAILURE);
     }
 
-    fprintf(file, "%s 1\n", username);
+    fprintf(file, "%s 1 0\n", username);
     send_with_error_handling(
         client_socket,
         buffer,
-        int_to_string(SIGN_UP_SUCCESSFULLY),
+        get_code_description(SIGN_UP_SUCCESSFULLY),
         "Send message login status error");
     fclose(file);
 };
@@ -127,7 +129,7 @@ void login(int client_socket, const char *username)
         send_with_error_handling(
             client_socket,
             buffer,
-            int_to_string(ACCOUNT_ALREADY_LOGGED_IN),
+            get_code_description(ACCOUNT_ALREADY_LOGGED_IN),
             "Send message login status error");
         return;
     }
@@ -140,7 +142,7 @@ void login(int client_socket, const char *username)
         send_with_error_handling(
             client_socket,
             buffer,
-            int_to_string(ACCOUNT_ALREADY_LOGGED_IN_ANOTHER_DEVICE),
+            get_code_description(ACCOUNT_ALREADY_LOGGED_IN_ANOTHER_DEVICE),
             "Send message login status error");
         return;
     }
@@ -153,7 +155,7 @@ void login(int client_socket, const char *username)
         send_with_error_handling(
             client_socket,
             buffer,
-            int_to_string(ACCOUNT_LOCKED),
+            get_code_description(ACCOUNT_LOCKED),
             "Send message login status error");
         break;
 
@@ -161,17 +163,17 @@ void login(int client_socket, const char *username)
         send_with_error_handling(
             client_socket,
             buffer,
-            int_to_string(ACCOUNT_NOT_FOUND),
+            get_code_description(ACCOUNT_NOT_FOUND),
             "Send message login status error");
         break;
 
     case ACCOUNT_VALID:
         // Account valid, create session and login
-        add_session(client_socket, "", 0, username, LOGGED_IN);
+        add_session(client_socket, "", 0, username);
         send_with_error_handling(
             client_socket,
             buffer,
-            int_to_string(ACCOUNT_EXISTS_AND_ACTIVE),
+            get_code_description(ACCOUNT_EXISTS_AND_ACTIVE),
             "Send message login status error");
         // print_all_sessions();
         break;
@@ -183,28 +185,26 @@ void login(int client_socket, const char *username)
 void logout(int client_socket)
 {
     char buffer[STRING_LENGTH];
-
-    int result = check_login_status(client_socket);
-    switch (result)
-    {
-    case LOGGED_IN:
-        delete_session_by_socket_id(client_socket);
-        send_with_error_handling(
-            client_socket,
-            buffer,
-            int_to_string(LOGOUT_SUCCESSFULLY),
-            "Send message login status error");
-        break;
-
-    case NOT_LOGGED_IN:
-        send_with_error_handling(
-            client_socket,
-            buffer,
-            int_to_string(NOT_HAVE_ACCESS),
-            "Send message login status error");
-        break;
-
-    default:
-        break;
-    }
+    delete_session_by_socket_id(client_socket);
+    send_with_error_handling(
+        client_socket,
+        buffer,
+        get_code_description(LOGOUT_SUCCESSFULLY),
+        "Send message login status error");
 };
+
+int auth_middleware(int client_socket)
+{
+    char buffer[STRING_LENGTH];
+    if (check_login_status(client_socket) == NOT_LOGGED_IN)
+    {
+        send_with_error_handling(
+            client_socket,
+            buffer,
+            get_code_description(NOT_HAVE_ACCESS),
+            "Send message login status error");
+        return 0;
+    }
+
+    return 1;
+}

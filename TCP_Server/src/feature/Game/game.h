@@ -23,4 +23,6 @@ typedef struct
   int current_player;
 } Game;
 
+void game(int player1_socket, int player2_socket);
+
 #endif

@@ -1,6 +1,6 @@
-#include "article.h"
+#include "online.h"
 
-void processUserList(const char *userList)
+void process_user_list(const char *userList)
 {
   // Create a copy of the input string that can be modified
   char userListCopy[STRING_LENGTH];
@@ -23,7 +23,7 @@ void processUserList(const char *userList)
   }
 }
 
-void getListUserOnline(int socket)
+void get_list_user_online(int socket)
 {
   char buffer[STRING_LENGTH];
   char message[STRING_LENGTH + 5];
@@ -41,30 +41,5 @@ void getListUserOnline(int socket)
       buffer,
       sizeof(buffer),
       "Error receiving data from the client");
-  processUserList(buffer);
-}
-
-void postArticle(int socket)
-{
-  char article[STRING_LENGTH];
-  char buffer[STRING_LENGTH];
-  char message[STRING_LENGTH + 5];
-
-  printf("Post article: ");
-  input(article, "string");
-
-  sprintf(message, "POST %s", article);
-
-  send_with_error_handling(
-      socket,
-      buffer,
-      message,
-      "Send message login status error");
-
-  // recv_with_error_handling(
-  //     socket,
-  //     buffer,
-  //     sizeof(buffer),
-  //     "Error receiving data from the client");
-  // printStatusMessage(buffer);
+  process_user_list(handle_response(buffer));
 }

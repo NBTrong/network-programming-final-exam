@@ -1,13 +1,14 @@
-tungbt 1
-admin 1
-ductq 0
-batrong 1
-badung 1
-new_account 1
-nbtrong 1
-hehe 1
-hohohoho 1
-hihihhihihih 1
-trongdeptrai 1
-quadeptrai 1
-hohohohohoho 1
+tungbt 1 0
+admin 1  0
+ductq 0  0
+batrong 1 0
+badung 1 0
+new_account 1 0
+nbtrong 1 0
+hehe 1 0
+hohohoho 1 0
+hihihhihihih 1 0
+trongdeptrai 1 0
+quadeptrai 1 0
+hohohohohoho 1 0
+thanhtu 1 0

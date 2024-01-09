@@ -16,6 +16,4 @@
  */
 void input(void *data, char *dataType);
 
-char *processDataFromResponse(const char *response);
-
 #endif

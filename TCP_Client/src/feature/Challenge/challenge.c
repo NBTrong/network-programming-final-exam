@@ -23,7 +23,7 @@ void challenge(int socket)
       buffer,
       sizeof(buffer),
       "Error receiving data from the client");
-  if (processDataFromResponse(buffer) == NULL)
+  if (handle_response(buffer) == NULL)
   {
     return;
   }
@@ -105,7 +105,7 @@ void get_challenged_list(int client_socket)
         buffer,
         sizeof(buffer),
         "Error receiving data from the client");
-    char *data = processDataFromResponse(buffer);
+    char *data = handle_response(buffer);
     if (data != NULL)
     {
       // Create a copy of the input string that can be modified
@@ -127,6 +127,10 @@ void get_challenged_list(int client_socket)
       {
         printf("No users challenging\n");
       }
+    }
+    else
+    {
+      return;
     }
 
     printf("Menu:\n");

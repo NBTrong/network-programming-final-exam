@@ -9,7 +9,7 @@
 #include "./utils/utils.h"
 #include "./config/menu.h"
 #include "./feature/Auth/auth.h"
-#include "./feature/Article/article.h"
+#include "./feature/Online/online.h"
 #include "./feature/Challenge/challenge.h"
 
 int main(int argc, char *argv[])
@@ -41,9 +41,10 @@ int main(int argc, char *argv[])
             break;
         case 2:
             login(client_socket);
+            printf("Break\n");
             break;
         case 3:
-            getListUserOnline(client_socket);
+            get_list_user_online(client_socket);
             break;
         case 4:
             challenge(client_socket);

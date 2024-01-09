@@ -17,6 +17,7 @@
     "string.h": "c",
     "ipc.h": "c",
     "game.h": "c",
-    "system_error": "c"
+    "system_error": "c",
+    "online.h": "c"
   }
 }

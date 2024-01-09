@@ -38,6 +38,12 @@ Room *add_room(
     char *sender_username,
     char *receiver_username);
 
+void remove_room(
+    int sender_socket_id,
+    int receiver_socket_id,
+    char *sender_username,
+    char *receiver_username);
+
 void send_to_queue(Room *room);
 
 #endif

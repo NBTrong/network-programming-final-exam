@@ -84,7 +84,6 @@ void *games_controller(void *arg)
     key = ftok("20194693", 65);
 
     // msgget creates a message queue
-    // and returns identifier
     msgid = msgget(key, 0666 | IPC_CREAT);
     message.mess_type = 1;
 
@@ -112,6 +111,11 @@ void init_game(void *arg)
 
     game(room->sender_socket_id, room->receiver_socket_id);
 
+    remove_room(room->sender_socket_id,
+                room->receiver_socket_id,
+                room->sender_username,
+                room->receiver_username);
+
     pthread_mutex_lock(&socket_mutex);
     in_game[room->sender_socket_id] = 0;
     in_game[room->receiver_socket_id] = 0;
@@ -130,7 +134,10 @@ void *handle_apis(void *arg)
     free(arg);
 
     printf("Client %d request connect\n", client_socket);
-    send_with_error_handling(client_socket, send_message, int_to_string(CONNECTED_SUCCESSFULLY), "Send message failed");
+    send_with_error_handling(client_socket,
+                             send_message,
+                             get_code_description(CONNECTED_SUCCESSFULLY),
+                             "Send message failed");
 
     fd_set read_fds;
     struct timeval tv;
@@ -198,23 +205,20 @@ void router(int client_socket, const char *message)
     }
     else if (strcmp(keyword, "ONLINE") == 0)
     {
+        if (!auth_middleware(client_socket))
+            return;
         send_all_sessions(client_socket);
     }
     else if (strcmp(keyword, "CHALLENGE") == 0)
     {
-        if (check_login_status(client_socket) == NOT_LOGGED_IN)
-        {
-            send_with_error_handling(
-                client_socket,
-                buffer,
-                int_to_string(NOT_HAVE_ACCESS),
-                "Send message login status error");
+        if (!auth_middleware(client_socket))
             return;
-        }
         challenge_router(client_socket, parameter);
     }
     else if (strcmp(keyword, "BYE") == 0)
     {
+        if (!auth_middleware(client_socket))
+            return;
         logout(client_socket);
     }
     else
