@@ -43,4 +43,8 @@ void handle_reject_challenge(int client_socket, char *sender_username);
 
 void handle_accept_challenge(int client_socket, char *sender_username);
 
+void delete_challenges_by_receiver_socket_id(int socket_id);
+
+void delete_challenges_by_sender_socket_id(int socket_id);
+
 #endif

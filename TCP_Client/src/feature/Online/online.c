@@ -11,12 +11,30 @@ void process_user_list(const char *userList)
 
   while (token != NULL)
   {
-    printf("%s online\n", token);
+    // Print the username
+    printf("%s ", token);
+
+    // Move to the next token (status)
     token = strtok(NULL, " ");
-    userCount++;
+
+    // Print the status
+    if (token != NULL)
+    {
+      printf("%s\n", token);
+      userCount++;
+    }
+    else
+    {
+      // If there is no corresponding status, print an error message
+      printf("Invalid format\n");
+      break;
+    }
+
+    // Move to the next username
+    token = strtok(NULL, " ");
   }
 
-  // Check if no users are online and replace with a space if needed
+  // Check if no users are online and replace with a message if needed
   if (userCount == 0)
   {
     printf("No users online\n");
@@ -41,5 +59,8 @@ void get_list_user_online(int socket)
       buffer,
       sizeof(buffer),
       "Error receiving data from the client");
-  process_user_list(handle_response(buffer));
+  char *data = handle_response(buffer);
+  if (data == NULL)
+    return;
+  process_user_list(data);
 }

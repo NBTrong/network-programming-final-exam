@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
             break;
         case 2:
             login(client_socket);
-            printf("Break\n");
             break;
         case 3:
             get_list_user_online(client_socket);

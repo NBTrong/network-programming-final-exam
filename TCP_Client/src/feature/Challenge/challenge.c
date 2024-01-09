@@ -48,8 +48,6 @@ void challenge(int socket)
           sizeof(buffer),
           "Error receiving data from the client");
 
-      // Process data received from the server
-      printf("Received from server: %s\n", buffer);
       if (strncmp(buffer, "SUCCESS", 7) != 0)
       {
         return;
@@ -157,8 +155,8 @@ void get_challenged_list(int client_socket)
           buffer,
           sizeof(buffer),
           "Error receiving data from the client");
-      printf("Recv from server: %s\n", buffer);
-      game(client_socket);
+      if (handle_response(buffer) != NULL)
+        game(client_socket);
       break;
 
     case 2:
@@ -176,7 +174,6 @@ void get_challenged_list(int client_socket)
           buffer,
           sizeof(buffer),
           "Error receiving data from the client");
-      printf("Recv from server: %s\n", buffer);
       break;
 
     case 3:
@@ -187,7 +184,7 @@ void get_challenged_list(int client_socket)
     default:
       // Invalid choice
       printf("Invalid choice. Please enter 1, 2, or 3.\n");
-      return;
+      break;
     }
 
   } while (choice != 3);

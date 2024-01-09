@@ -101,6 +101,77 @@ void get_challenged_list(int client_socket)
                              "Send user list error");
 }
 
+typedef struct
+{
+    char username[50];
+    int is_blocked;
+    int score;
+} Player;
+
+int compare_players(const void *a, const void *b)
+{
+    return ((Player *)a)->score - ((Player *)b)->score;
+}
+
+int find_player_rank(Player players[], int num_players, const char *username)
+{
+    for (int i = 0; i < num_players; i++)
+    {
+        if (strcmp(players[i].username, username) == 0)
+        {
+            return i + 1; // Rank is 1-indexed
+        }
+    }
+    return -1; // Player not found
+}
+
+int check_rank_difference(const char *username1, const char *username2)
+{
+    // Read file
+    FILE *file = fopen("./TCP_Server/database/account.txt", "r"); // Open the file in read mode ("r")
+
+    if (file == NULL)
+    {
+        printf("Unable to open the file.\n");
+        exit(1); // Exit the program with an error code
+    }
+
+    char line[MAX_LINE_LENGTH];
+    char test0[STRING_LENGTH];
+    int test1, test2;
+    Player players[MAX_PLAYERS];
+    int num_players = 0;
+
+    // Read players from the file
+    while (fscanf(file, "%s %d %d", players[num_players].username, &players[num_players].is_blocked, &players[num_players].score) == 3)
+    {
+        num_players++;
+        if (num_players >= MAX_PLAYERS)
+        {
+            fprintf(stderr, "Too many players in the file. Increase MAX_PLAYERS.\n");
+            fclose(file);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Sort players based on score
+    qsort(players, num_players, sizeof(Player), compare_players);
+
+    // Find ranks of the two players
+    int rank1 = find_player_rank(players, num_players, username1);
+    int rank2 = find_player_rank(players, num_players, username2);
+
+    printf("User1 rank: %d, user2 rank: %d\n", rank1, rank2);
+
+    // Calculate rank difference and return the result
+    int rank_difference = abs(rank1 - rank2);
+
+    // Close the file before returning
+    fclose(file);
+
+    return rank_difference;
+}
+
 void send_challenge(int client_socket, const char *parameter)
 {
     char buffer[STRING_LENGTH];
@@ -147,7 +218,17 @@ void send_challenge(int client_socket, const char *parameter)
 
     // Check rank
     // Get position on the rankings, compare
-    // TODO
+    int rank_difference = check_rank_difference(client_session->client_username, enemy_session->client_username);
+    if (rank_difference > 10)
+    {
+        send_with_error_handling(
+            client_socket,
+            buffer,
+            "ERROR The ranking difference is too big, challenge others",
+            "Send message failed");
+        return;
+    }
+    printf("The rank difference is: %d\n", rank_difference);
 
     // Add challenge to challenge_list
     add_challenge(client_socket,
@@ -397,4 +478,87 @@ void printf_room_list()
         printf("Sender: %s, Receiver: %s\n", current->sender_username, current->receiver_username);
         current = current->next;
     }
+}
+
+void delete_challenges_by_receiver_socket_id(int socket_id)
+{
+    pthread_mutex_lock(&mutex);
+    Challenge *current = challenge_list;
+    Challenge *prev = NULL;
+    char buffer[STRING_LENGTH];
+
+    // Traverse the challenge list
+    while (current != NULL)
+    {
+        // If the receiver_socket_id of the node is equal to socket_id, delete that node
+        if (current->receiver_socket_id == socket_id)
+        {
+            send_with_error_handling(current->sender_socket_id,
+                                     buffer,
+                                     "ERROR Enemy disconnect",
+                                     "Send error");
+            if (prev == NULL)
+            {
+                // If the node to be deleted is the first node
+                Challenge *temp = current;
+                challenge_list = current->next;
+                current = current->next;
+                free(temp);
+            }
+            else
+            {
+                // If the node to be deleted is not the first node
+                Challenge *temp = current;
+                prev->next = current->next;
+                current = current->next;
+                free(temp);
+            }
+        }
+        else
+        {
+            // If it's not the node to be deleted, move to the next node
+            prev = current;
+            current = current->next;
+        }
+    }
+    pthread_mutex_unlock(&mutex);
+}
+
+void delete_challenges_by_sender_socket_id(int socket_id)
+{
+    pthread_mutex_lock(&mutex);
+    Challenge *current = challenge_list;
+    Challenge *prev = NULL;
+
+    // Traverse the challenge list
+    while (current != NULL)
+    {
+        // If the receiver_socket_id of the node is equal to socket_id, delete that node
+        if (current->sender_socket_id == socket_id)
+        {
+            if (prev == NULL)
+            {
+                // If the node to be deleted is the first node
+                Challenge *temp = current;
+                challenge_list = current->next;
+                current = current->next;
+                free(temp);
+            }
+            else
+            {
+                // If the node to be deleted is not the first node
+                Challenge *temp = current;
+                prev->next = current->next;
+                current = current->next;
+                free(temp);
+            }
+        }
+        else
+        {
+            // If it's not the node to be deleted, move to the next node
+            prev = current;
+            current = current->next;
+        }
+    }
+    pthread_mutex_unlock(&mutex);
 }

@@ -124,6 +124,18 @@ void send_all_sessions(int client_socket)
     printf("username: %s\n", current->client_username);
     strcat(user_list, current->client_username);
     strcat(user_list, " "); // Add a space to separate usernames
+
+    // Find room
+
+    if (find_room_by_socket_id(current->socket_id) == NULL)
+    {
+      strcat(user_list, "online ");
+    }
+    else
+    {
+      strcat(user_list, "playing ");
+    }
+
     current = current->next;
     printf("User list: %s\n", user_list);
   }

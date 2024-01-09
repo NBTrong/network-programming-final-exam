@@ -183,6 +183,8 @@ void *handle_apis(void *arg)
     }
 
     delete_session_by_socket_id(client_socket);
+    delete_challenges_by_receiver_socket_id(client_socket);
+    delete_challenges_by_sender_socket_id(client_socket);
 
     return 0;
 }

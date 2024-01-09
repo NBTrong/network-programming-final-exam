@@ -7,6 +7,9 @@
 #define STRING_LENGTH 100
 #define MAX_CLIENTS 100
 
+#define MAX_LINE_LENGTH 1000
+#define MAX_PLAYERS 100
+
 extern char currentUser[STRING_LENGTH];
 extern int msgid;
 extern pthread_mutex_t mutex;

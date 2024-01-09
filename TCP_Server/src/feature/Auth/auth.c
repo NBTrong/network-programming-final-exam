@@ -186,6 +186,8 @@ void logout(int client_socket)
 {
     char buffer[STRING_LENGTH];
     delete_session_by_socket_id(client_socket);
+    delete_challenges_by_receiver_socket_id(client_socket);
+    delete_challenges_by_sender_socket_id(client_socket);
     send_with_error_handling(
         client_socket,
         buffer,

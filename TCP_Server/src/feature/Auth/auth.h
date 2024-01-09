@@ -10,6 +10,7 @@
 #include "../Session/session.h"
 #include "../../utils/utils.h"
 #include "../../config/tcp.h"
+#include "../Challenge/challenge.h"
 
 /**
  * @brief Check the login status.
