@@ -16,6 +16,7 @@
     "room.h": "c",
     "string.h": "c",
     "ipc.h": "c",
-    "game.h": "c"
+    "game.h": "c",
+    "system_error": "c"
   }
 }

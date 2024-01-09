@@ -71,6 +71,8 @@ int recv_with_error_handling(const int client_socket, char *buffer, size_t size,
     // Null-terminate the received content
     buffer[content_length] = '\0';
 
+    printf("Recv from server: %s\n", buffer);
+
     return result;
 }
 

@@ -43,4 +43,6 @@ int recv_with_error_handling(const int client_socket, char *buffer, size_t size,
 
 void printStatusMessage(const char *status);
 
+char *int_to_string(int num);
+
 #endif

@@ -110,7 +110,7 @@ void init_game(void *arg)
     pthread_cond_broadcast(&cond);
     pthread_mutex_unlock(&socket_mutex);
 
-    sleep(100000000);
+    game(room->sender_socket_id, room->receiver_socket_id);
 
     pthread_mutex_lock(&socket_mutex);
     in_game[room->sender_socket_id] = 0;
