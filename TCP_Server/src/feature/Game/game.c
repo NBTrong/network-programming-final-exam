@@ -342,5 +342,9 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
     }
 
     fclose(log_file);
+
+    file_sending_protocol(player1_socket, log_filename);
+    file_sending_protocol(player2_socket, log_filename);
+
     printf("Game over.\n");
 }

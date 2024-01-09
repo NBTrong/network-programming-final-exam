@@ -18,6 +18,11 @@
     "ipc.h": "c",
     "game.h": "c",
     "system_error": "c",
-    "online.h": "c"
+    "online.h": "c",
+    "receiver.h": "c",
+    "array": "c",
+    "string_view": "c",
+    "initializer_list": "c",
+    "utility": "c"
   }
 }

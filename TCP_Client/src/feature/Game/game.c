@@ -158,5 +158,7 @@ void game(int sockfd)
       printf("Unknown message.");
   }
 
+  file_receiving_protocol(sockfd);
+
   printf("Game over.\n");
 }

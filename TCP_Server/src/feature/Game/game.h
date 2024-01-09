@@ -11,6 +11,7 @@
 #include "../../utils/utils.h"
 #include "../../config/tcp.h"
 #include "../Room/room.h"
+#include "../Sender/sender.h"
 
 #define BOARD_SIZE 3
 #define EMPTY 0

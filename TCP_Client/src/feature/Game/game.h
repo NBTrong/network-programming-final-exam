@@ -9,6 +9,7 @@
 #include <sys/select.h>
 #include <unistd.h>
 #include "../../utils/utils.h"
+#include "../Receiver/receiver.h"
 
 #include <stdio.h>
 #include <stdlib.h>
