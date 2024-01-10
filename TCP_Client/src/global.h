@@ -4,7 +4,7 @@
 
 #include <pthread.h>
 
-#define STRING_LENGTH 100
+#define STRING_LENGTH 1000
 
 extern int isResponse;
 
