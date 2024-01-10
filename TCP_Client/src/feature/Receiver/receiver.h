@@ -15,12 +15,12 @@
 #define FILE_SIZE_LIMIT 4294967296
 
 /**
- * Implement a file receiving protocol on the specified sender socket.
- * This function handles the process of receiving a file from the client.
- * @param sender_socket The socket descriptor for the sender (client).
- * @param client_ip The IP address of the client sending the file.
- * @param client_port The port number used for the client's connection.
- * @return 0 on successful file reception, or -1 in case of an error.
+ * @brief Receive a file from a client using a predefined protocol.
+ *
+ * This function implements a protocol for receiving files from a client. It first receives the filename and size from the client, 
+ * checks the file size limit, and then asks the client to send the file. It receives the file data and saves it to a file on the server.
+ * 
+ * @param sender_socket The socket of the client sending the file.
  */
 void file_receiving_protocol(int sender_socket);
 

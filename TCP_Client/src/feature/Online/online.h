@@ -6,22 +6,21 @@
 #include "../../utils/utils.h"
 
 /**
- * @brief Get list user online
- * 
- * This function allows a user to get list user online
- * 
- * @param client_socket The socket of the client sending the message.
- * @return The online-related message received from the client.
-*/
+ * @brief Process and display the list of online users.
+ *
+ * This function takes a string containing a list of online users and their status and displays it in a readable format.
+ *
+ * @param userList The string containing the list of online users and their statuses.
+ */
 void get_list_user_online(int socket);
 
 /**
- * @brief Process list user online
- * 
- * This function allows a user to process list user online
- * 
- * @param userList The list user online.
-*/
+ * @brief Request and display the list of online users from the server.
+ *
+ * This function sends a request to the server to retrieve the list of online users and then processes and displays the list.
+ *
+ * @param socket The socket used for communication with the server.
+ */
 void process_user_list(const char *userList);
 
 #endif
