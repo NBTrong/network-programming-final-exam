@@ -139,7 +139,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
     // Log game
     int log[8] = {0};
     int winner = -1;
-    char comment_log[STRING_LENGTH];
+    char comment_log[STRING_LENGTH] = "";
 
     // Time start game
     time_t start_time;
@@ -337,6 +337,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
             fprintf(log_file, "%s move %d\n", player2_username, log[i]);
         }
     }
+    fprintf(log_file, "%s", comment_log);
     if (winner == -1)
     {
         fprintf(log_file, "Draw\n");

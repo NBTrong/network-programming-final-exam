@@ -2,7 +2,7 @@ tungbt 1 4
 admin 1 2
 ductq 0 3
 batrong 1 4
-badung 1 14
+badung 1 8
 new_account 1 6
 nbtrong 1 -5
 hehe 1 8
@@ -11,6 +11,7 @@ hihihhihihih 1 10
 trongdeptrai 1 11
 quadeptrai 1 12
 hohohohohoho 1 13
-thanhtu 1 14
+thanhtu 1 20
 anhthu 1 0
+
 
