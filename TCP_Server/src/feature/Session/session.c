@@ -118,11 +118,24 @@ void send_all_sessions(int client_socket)
                              "Send user list error");
     return;
   }
+
+  // Load player from file
+  Player players[MAX_CLIENTS];
+  int num_players = read_players_from_file(players);
+
   // Append usernames to the user_list string
   while (current != NULL)
   {
-    printf("username: %s\n", current->client_username);
+    int rank = find_player_rank(players, num_players, current->client_username);
+    int score = find_player_score(players, num_players, current->client_username);
+    char label[STRING_LENGTH];
+    sprintf(label, "NO.%d(%d)---", rank, score);
+    strcat(user_list, label);
     strcat(user_list, current->client_username);
+    if (current->socket_id == client_socket)
+    {
+      strcat(user_list, ("(you)"));
+    }
     strcat(user_list, " "); // Add a space to separate usernames
 
     // Find room

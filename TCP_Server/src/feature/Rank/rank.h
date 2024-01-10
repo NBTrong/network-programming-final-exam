@@ -23,4 +23,6 @@ int read_players_from_file(Player players[]);
 
 int check_rank_difference(const char *username1, const char *username2);
 
+int find_player_score(Player players[], int num_players, const char *username);
+
 #endif

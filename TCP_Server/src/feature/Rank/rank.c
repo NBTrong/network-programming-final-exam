@@ -2,7 +2,7 @@
 
 int compare_players(const void *a, const void *b)
 {
-    return ((Player *)a)->score - ((Player *)b)->score;
+    return ((Player *)b)->score - ((Player *)a)->score;
 }
 
 int find_player_rank(Player players[], int num_players, const char *username)
@@ -15,6 +15,18 @@ int find_player_rank(Player players[], int num_players, const char *username)
         }
     }
     return -1; // Player not found
+}
+
+int find_player_score(Player players[], int num_players, const char *username)
+{
+    for (int i = 0; i < num_players; i++)
+    {
+        if (strcmp(players[i].username, username) == 0)
+        {
+            return players[i].score; // Rank is 1-indexed
+        }
+    }
+    return -9999; // Player not found
 }
 
 int read_players_from_file(Player players[])
