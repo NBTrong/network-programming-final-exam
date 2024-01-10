@@ -30,61 +30,67 @@ typedef struct Session
 extern Session *session_list; // External variable to store the linked list of sessions
 
 /**
- * @brief Add a new session to the linked list.
+ * @brief Add a new session to the session list.
  *
- * This function creates a new session with the provided information and adds it to the linked list.
+ * This function creates a new session and adds it to the linked list of active sessions.
  *
- * @param socket_id The socket ID associated with the session.
+ * @param socket_id The socket ID of the client.
  * @param client_addr The client's IP address.
- * @param port The port number for communication.
- * @param client_username The username associated with the session.
- * @param login_status The login status (e.g., LOGGED_IN or NOT_LOGGED_IN).
+ * @param port The client's port.
+ * @param client_username The username of the client.
  */
 void add_session(int socket_id, const char *client_addr, int port, const char *client_username);
 
 /**
- * @brief Free the memory allocated for the session linked list.
+ * @brief Free the memory associated with the session list.
  *
- * This function deallocates the memory used by the entire session linked list.
+ * This function releases the memory allocated for the linked list of sessions.
  */
 void free_session_list();
 
 /**
  * @brief Find a session by username.
  *
- * This function searches for a session with the specified username in the linked list.
+ * This function searches for a session with the given username in the session list.
  *
  * @param username The username to search for.
- * @return A pointer to the found session or NULL if not found.
+ * @return A pointer to the session if found, or NULL if not found.
  */
 Session *find_session_by_username(const char *username);
 
 /**
  * @brief Find a session by socket ID.
  *
- * This function searches for a session with the specified socket ID in the linked list.
+ * This function searches for a session with the given socket ID in the session list.
  *
  * @param socket_id The socket ID to search for.
- * @return A pointer to the found session or NULL if not found.
+ * @return A pointer to the session if found, or NULL if not found.
  */
 Session *find_session_by_socket_id(int socket_id);
 
 /**
  * @brief Print information about all active sessions.
  *
- * This function prints information about all active sessions in the linked list.
+ * This function prints information about all active sessions, including socket ID, client address, and username.
  */
 void print_all_sessions();
 
 /**
- * @brief Delete a session by socket ID.
+ * @brief Delete a session by its socket ID.
  *
- * This function removes the session with the specified socket ID from the linked list.
+ * This function removes a session with the given socket ID from the session list.
  *
  * @param socket_id The socket ID of the session to be deleted.
  */
 void delete_session_by_socket_id(int socket_id);
 
+/**
+ * @brief Send a list of all active sessions to a client.
+ *
+ * This function sends a list of all logged-in users and their statuses to a client.
+ *
+ * @param client_socket The socket of the client to whom the list will be sent.
+ */
 void send_all_sessions(int client_socket);
 
 #endif // SESSION_H

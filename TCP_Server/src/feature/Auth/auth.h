@@ -57,69 +57,82 @@ enum Code
   NOT_HAVE_ACCESS,
 };
 
+/**
+ * @brief Get the description of a message code.
+ *
+ * This function returns the description of a message code.
+ *
+ * @param code The message code.
+ * @return The description of the message code.
+ */
 const char *get_code_description(enum Code code);
 
 /**
- * @brief Check the login status for a given client socket.
+ * @brief Check the login status of a client.
  *
- * This function checks if a user is currently logged in or not by examining the `currentUser` variable.
+ * This function checks whether a client is logged in or not.
  *
- * @param client_socket The socket of the client.
- * @return An integer constant representing the login status (LOGGED_IN or NOT_LOGGED_IN).
+ * @param client_socket The client socket.
+ * @return NOT_LOGGED_IN if not logged in, LOGGED_IN if logged in.
  */
 int check_login_status(int client_socket);
 
 /**
- * @brief Verify the status of an account in the account.txt file.
+ * @brief Verify an account's validity.
  *
- * This function verifies the status of an account by checking the "account.txt" file. If the account
- * is banned or not found, appropriate status codes are returned.
+ * This function verifies the validity of an account based on the account's status.
  *
- * @param account A string representing the account to be verified.
- * @return An integer constant representing the account status (ACCOUNT_BANNED, ACCOUNT_VALID, or ACCOUNT_NOT_EXIST).
+ * @param account The account username to verify.
+ * @return ACCOUNT_BANNED if the account is banned, ACCOUNT_VALID if the account is active, ACCOUNT_NOT_EXIST if the account does not exist.
  */
 int verify_account(const char *account);
 
 /**
- * @brief Log in the user.
+ * @brief Check if an account exists.
  *
- * This function allows the user to log in by entering a username. It verifies the account and handles
- * various scenarios, including successful login, banned accounts, and non-existent accounts.
+ * This function checks if an account with the given username exists.
  *
- * @param client_socket The socket of the client.
- * @param username The username entered by the user for login.
+ * @param username The username to check.
+ * @return 1 if the account exists, 0 if it does not.
+ */
+int check_account_existence(const char *username);
+
+/**
+ * @brief Handle the login process.
+ *
+ * This function handles the login process for a client.
+ *
+ * @param client_socket The client socket.
+ * @param username The username to log in.
  */
 void login(int client_socket, const char *username);
 
 /**
- * @brief Log out the user.
+ * @brief Handle the logout process.
  *
- * This function allows the user to log out if they are currently logged in. It clears the `currentUser`
- * variable and logs the logout action.
+ * This function handles the logout process for a client.
  *
- * @param client_socket The socket of the client.
+ * @param client_socket The client socket.
  */
 void logout(int client_socket);
 
 /**
- * @brief Sign up a new user.
+ * @brief Handle the sign-up process.
  *
- * This function allows a new user to sign up by entering a username. It verifies if the username
- * is available and adds it to the system if it's not already taken.
+ * This function handles the sign-up process for a client.
  *
- * @param client_socket The socket of the client.
- * @param username The username entered by the user for sign-up.
+ * @param client_socket The client socket.
+ * @param username The username to sign up.
  */
 void sign_up(int client_socket, const char *username);
 
 /**
  * @brief Middleware for authentication.
  *
- * This function acts as a middleware to enforce authentication for accessing certain functionalities.
- * It checks the login status of the client and ensures that only authenticated users can access protected features.
+ * This function acts as a middleware to check if a client is authenticated (logged in).
  *
- * @param client_socket The socket of the client.
- * @return An integer constant representing the result of the authentication check.
+ * @param client_socket The client socket.
+ * @return 1 if authenticated, 0 if not authenticated.
  */
 int auth_middleware(int client_socket);
 
