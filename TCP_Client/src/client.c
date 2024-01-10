@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     while (choice != 4)
     {
         menu();
-        printf("Enter your choice(1-4): ");
+        printf("Enter your choice(1-7): ");
         input(&choice, "int");
 
         switch (choice)
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
             exit(1);
             break;
         default:
-            printf("Invalid choice. Please enter a valid option (1-4).\n");
+            printf("Invalid choice. Please enter a valid option (1-7).\n");
             break;
         }
         choice = -1;

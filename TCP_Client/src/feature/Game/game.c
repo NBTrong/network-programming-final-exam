@@ -95,9 +95,9 @@ void game(int sockfd)
                              buffer,
                              sizeof(buffer),
                              "Error receiving data from the client");
-    if (!strcmp(buffer, "HLD"))
+    if (!strcmp(buffer, "HOLD"))
       printf("Waiting for a second player...\n");
-  } while (strcmp(buffer, "SRT"));
+  } while (strcmp(buffer, "START"));
 
   /* The game has begun. */
   printf("Game on!\n");
@@ -111,16 +111,16 @@ void game(int sockfd)
                              sizeof(buffer),
                              "Error receiving data from the client");
 
-    if (!strcmp(buffer, "TRN"))
+    if (!strcmp(buffer, "TURN"))
     {
       printf("Your move...\n");
       take_turn(sockfd);
     }
-    else if (!strcmp(buffer, "INV"))
+    else if (!strcmp(buffer, "INVALID"))
     {
       printf("That position has already been played. Try again.\n");
     }
-    else if (!strcmp(buffer, "CNT"))
+    else if (!strcmp(buffer, "COUNT"))
     {
       recv_with_error_handling(sockfd,
                                buffer,
@@ -129,12 +129,12 @@ void game(int sockfd)
       int num_players = convert_string_to_number(buffer);
       printf("There are currently %d active players.\n", num_players);
     }
-    else if (!strcmp(buffer, "UPD"))
+    else if (!strcmp(buffer, "UPDATE"))
     {
       get_update(sockfd, board);
       draw_board(board);
     }
-    else if (!strcmp(buffer, "WAT"))
+    else if (!strcmp(buffer, "WAIT"))
     {
       printf("Waiting for other players move...\n");
     }
@@ -143,12 +143,12 @@ void game(int sockfd)
       printf("You win!\n");
       break;
     }
-    else if (!strcmp(buffer, "LSE"))
+    else if (!strcmp(buffer, "LOSE"))
     {
       printf("You lost.\n");
       break;
     }
-    else if (!strcmp(buffer, "DRW"))
+    else if (!strcmp(buffer, "DRAW"))
     {
       printf("Draw.\n");
       break;
