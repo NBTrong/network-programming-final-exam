@@ -28,7 +28,7 @@ void challenge(int socket)
     return;
   }
 
-  printf("Recv from server: %s \n", buffer);
+  // printf("Recv from server: %s \n", buffer);
 
   printf("Waiting enemy ...\n");
   printf("If you want to exit, enter any characters\n");
@@ -76,7 +76,7 @@ void challenge(int socket)
           buffer,
           sizeof(buffer),
           "Error receiving data from the client");
-      printf("Recv from server: %s\n", buffer);
+      // printf("Recv from server: %s\n", buffer);
     }
   }
 

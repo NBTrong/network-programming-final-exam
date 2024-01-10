@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
         case 5:
             get_challenged_list(client_socket);
             break;
-        case 99:
+        case 6:
             logout(client_socket);
             break;
-        case 100:
+        case 7:
             exit(1);
             break;
         default:

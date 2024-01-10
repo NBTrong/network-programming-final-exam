@@ -9,7 +9,7 @@ void menu()
     printf("3. View all user online\n");
     printf("4. Challenge\n");
     printf("5. Challenged list\n");
-    printf("x. Logout\n");
-    printf("x. Exit\n");
+    printf("6. Logout\n");
+    printf("7. Exit\n");
     printf("------------------------------------------------------------------\n");
 };
