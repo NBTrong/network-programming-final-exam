@@ -12,6 +12,7 @@
 #include "../../config/tcp.h"
 #include "../Room/room.h"
 #include "../Sender/sender.h"
+#include "../Rank/rank.h"
 
 #define BOARD_SIZE 3
 #define EMPTY 0

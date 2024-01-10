@@ -163,7 +163,7 @@ void *handle_apis(void *arg)
             pthread_mutex_lock(&socket_mutex);
             while (in_game[client_socket])
             {
-                printf("IN game %d %d\n", in_game[client_socket], client_socket);
+                printf("In game %d %d\n", in_game[client_socket], client_socket);
                 // Wait here if the client is in a game
                 pthread_cond_wait(&cond, &socket_mutex);
             }

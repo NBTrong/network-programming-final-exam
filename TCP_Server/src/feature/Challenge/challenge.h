@@ -11,6 +11,7 @@
 #include "../../utils/utils.h"
 #include "../../config/tcp.h"
 #include "../Room/room.h"
+#include "../Rank/rank.h"
 
 typedef struct Challenge
 {
