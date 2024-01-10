@@ -50,7 +50,7 @@ int get_player_move(int socket)
     send_with_error_handling(
         socket,
         buffer,
-        "TRN",
+        "TURN",
         "Send message failed");
 
     if (!recv_with_error_handling(socket,
@@ -89,7 +89,7 @@ void send_update(int *cli_sockfd, int move, int player_id)
 {
     printf("Sending update...\n");
 
-    send_all(cli_sockfd[0], cli_sockfd[1], "UPD");
+    send_all(cli_sockfd[0], cli_sockfd[1], "UPDATE");
 
     send_all(cli_sockfd[0], cli_sockfd[1], int_to_string(player_id));
 
@@ -176,7 +176,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
         int_to_string(player2_socket),
         "Send message failed");
 
-    send_all(player1_socket, player2_socket, "SRT");
+    send_all(player1_socket, player2_socket, "START");
 
     draw_board(board);
 
@@ -194,7 +194,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
             send_with_error_handling(
                 players_socket[(player_turn + 1) % 2],
                 buffer,
-                "WAT",
+                "WAIT",
                 "Send message failed");
 
         int valid = 0;
@@ -221,7 +221,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                 send_with_error_handling(
                     players_socket[player_turn],
                     buffer,
-                    "INV",
+                    "INVALID",
                     "Send message failed");
             }
         }
@@ -246,7 +246,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
             send_with_error_handling(
                 players_socket[player_turn],
                 buffer,
-                "LSE",
+                "LOSE",
                 "Send message failed");
             send_with_error_handling(
                 players_socket[(player_turn + 1) % 2],
@@ -276,7 +276,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                 send_with_error_handling(
                     players_socket[(player_turn + 1) % 2],
                     buffer,
-                    "LSE",
+                    "LOSE",
                     "Send message failed");
                 printf("Player %d won.\n", player_turn);
                 winner = player_turn;
@@ -284,7 +284,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
             else if (turn_count == 8)
             {
                 printf("Draw.\n");
-                send_all(players_socket[player_turn], players_socket[(player_turn + 1) % 2], "DRW");
+                send_all(players_socket[player_turn], players_socket[(player_turn + 1) % 2], "DRAW");
                 game_over = 1;
                 winner = -1;
             }
