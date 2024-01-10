@@ -139,6 +139,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
     // Log game
     int log[8] = {0};
     int winner = -1;
+    char comment_log[STRING_LENGTH] = "";
 
     // Time start game
     time_t start_time;
@@ -238,6 +239,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                 "Send message failed");
             printf("Player %d won.\n", (player_turn + 1) % 2);
             winner = (player_turn + 1) % 2;
+            sprintf(comment_log, "%s disconnect\n", players_username[player_turn]);
         }
         else if (move == 10)
         {
@@ -255,6 +257,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                 "Send message failed");
             printf("Player %d won.\n", player_turn);
             winner = (player_turn + 1) % 2;
+            sprintf(comment_log, "%s gives up\n", players_username[player_turn]);
         }
         else
         {
@@ -280,6 +283,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                     "Send message failed");
                 printf("Player %d won.\n", player_turn);
                 winner = player_turn;
+                sprintf(comment_log, "End game\n");
             }
             else if (turn_count == 8)
             {
@@ -287,6 +291,7 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
                 send_all(players_socket[player_turn], players_socket[(player_turn + 1) % 2], "DRAW");
                 game_over = 1;
                 winner = -1;
+                sprintf(comment_log, "End game\n");
             }
 
             prev_player_turn = player_turn;
@@ -332,9 +337,10 @@ void game(int player1_socket, int player2_socket, char *player1_username, char *
             fprintf(log_file, "%s move %d\n", player2_username, log[i]);
         }
     }
+    fprintf(log_file, "%s", comment_log);
     if (winner == -1)
     {
-        fprintf(log_file, "Winner is: Draw\n");
+        fprintf(log_file, "Draw\n");
     }
     else
     {

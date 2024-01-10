@@ -12,9 +12,14 @@
 
 extern char currentUser[STRING_LENGTH];
 extern int msgid;
-extern pthread_mutex_t mutex;
+
+extern pthread_mutex_t session_mutex;
+extern pthread_mutex_t challenge_mutex;
+extern pthread_mutex_t game_mutex;
+extern pthread_mutex_t room_mutex;
 extern pthread_mutex_t socket_mutex;
 extern pthread_cond_t cond;
+
 extern const char *messageCodes[];
 extern int in_game[MAX_CLIENTS];
 

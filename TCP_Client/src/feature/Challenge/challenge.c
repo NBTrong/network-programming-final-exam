@@ -50,6 +50,7 @@ void challenge(int socket)
 
       if (strncmp(buffer, "SUCCESS", 7) != 0)
       {
+        printf("Enemy reject\n");
         return;
       }
       else

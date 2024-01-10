@@ -4,7 +4,7 @@ Session *session_list = NULL;
 
 void add_session(int socket_id, const char *client_addr, int port, const char *client_username)
 {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&session_mutex);
   Session *new_session = (Session *)malloc(sizeof(Session));
   new_session->socket_id = socket_id;
   strcpy(new_session->client_addr, client_addr);
@@ -13,12 +13,12 @@ void add_session(int socket_id, const char *client_addr, int port, const char *c
 
   new_session->next = session_list;
   session_list = new_session;
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&session_mutex);
 }
 
 void free_session_list()
 {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&session_mutex);
   Session *current = session_list;
   Session *next;
 
@@ -30,13 +30,13 @@ void free_session_list()
   }
 
   session_list = NULL;
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&session_mutex);
 }
 
 // Function to find a session by username
 Session *find_session_by_username(const char *username)
 {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&session_mutex);
   Session *current = session_list;
 
   while (current != NULL)
@@ -44,7 +44,7 @@ Session *find_session_by_username(const char *username)
     if (strcmp(current->client_username, username) == 0)
     {
       // Return a pointer to the session if the username matches
-      pthread_mutex_unlock(&mutex);
+      pthread_mutex_unlock(&session_mutex);
       return current;
     }
 
@@ -52,13 +52,13 @@ Session *find_session_by_username(const char *username)
   }
 
   // Return NULL if not found
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&session_mutex);
   return NULL;
 }
 
 Session *find_session_by_socket_id(int socket_id)
 {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&session_mutex);
   Session *current = session_list;
 
   while (current != NULL)
@@ -66,7 +66,7 @@ Session *find_session_by_socket_id(int socket_id)
     if (current->socket_id == socket_id)
     {
       // Return a pointer to the session if the socket_id matches
-      pthread_mutex_unlock(&mutex);
+      pthread_mutex_unlock(&session_mutex);
       return current;
     }
 
@@ -74,14 +74,14 @@ Session *find_session_by_socket_id(int socket_id)
   }
 
   // Return NULL if not found
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&session_mutex);
   return NULL;
 }
 
 void print_all_sessions()
 {
   // Lock the mutex before accessing shared data
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&session_mutex);
 
   // Critical section: read shared data (e.g., session_list)
   Session *current = session_list;
@@ -98,13 +98,13 @@ void print_all_sessions()
   }
 
   // Unlock the mutex after critical section
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&session_mutex);
 }
 
 void send_all_sessions(int client_socket)
 {
   // Lock the mutex before accessing shared data
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&session_mutex);
 
   // Critical section: read shared data (e.g., session_list)
   Session *current = session_list;
@@ -154,7 +154,7 @@ void send_all_sessions(int client_socket)
   }
 
   // Unlock the mutex after the critical section
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&session_mutex);
 
   // Send the list of logged-in users to the client
   char buffer[STRING_LENGTH];
@@ -167,7 +167,7 @@ void send_all_sessions(int client_socket)
 void delete_session_by_socket_id(int socket_id)
 {
   // Lock the mutex before accessing shared data
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&session_mutex);
 
   // Critical section: update shared data (e.g., session_list)
   Session *current = session_list;
@@ -199,5 +199,5 @@ void delete_session_by_socket_id(int socket_id)
   }
 
   // Unlock the mutex after critical section
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&session_mutex);
 }

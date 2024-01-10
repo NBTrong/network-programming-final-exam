@@ -11,7 +11,7 @@ Room *find_room_by_socket_id(int socket_id)
     if (current->sender_socket_id == socket_id || current->receiver_socket_id == socket_id)
     {
       // Return a pointer to the Room if the socket_id matches
-      pthread_mutex_unlock(&mutex);
+      pthread_mutex_unlock(&room_mutex);
       return current;
     }
 
@@ -28,7 +28,7 @@ Room *add_room(
     char *sender_username,
     char *receiver_username)
 {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&room_mutex);
   Room *new_room = (Room *)malloc(sizeof(Room));
   new_room->sender_socket_id = sender_socket_id;
   new_room->receiver_socket_id = receiver_socket_id;
@@ -36,7 +36,7 @@ Room *add_room(
   strcpy(new_room->receiver_username, receiver_username);
   new_room->next = room_list;
   room_list = new_room;
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&room_mutex);
 
   return new_room;
 }
@@ -47,7 +47,7 @@ void remove_room(
     char *sender_username,
     char *receiver_username)
 {
-  pthread_mutex_lock(&mutex);
+  pthread_mutex_lock(&room_mutex);
 
   Room *current = room_list;
   Room *prev = NULL;
@@ -81,7 +81,7 @@ void remove_room(
     free(current);
   }
 
-  pthread_mutex_unlock(&mutex);
+  pthread_mutex_unlock(&room_mutex);
 }
 
 void send_to_queue(Room *room)

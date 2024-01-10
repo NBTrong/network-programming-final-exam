@@ -49,7 +49,7 @@ void get_challenged_list(int client_socket)
     Challenge *result_tail = NULL;
 
     // Traverse the linked list
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
     Challenge *current = challenge_list;
     while (current != NULL)
     {
@@ -78,7 +78,7 @@ void get_challenged_list(int client_socket)
         current = current->next;
     }
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
 
     char buffer[STRING_LENGTH];
     char response[STRING_LENGTH] = "SUCCESS ";
@@ -179,7 +179,7 @@ void handle_cancel_challenge(int client_socket, char *enemy_username)
     char buffer[STRING_LENGTH];
 
     // Lock the mutex before accessing shared data
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
 
     Challenge *current = challenge_list;
     Challenge *prev = NULL;
@@ -217,14 +217,14 @@ void handle_cancel_challenge(int client_socket, char *enemy_username)
             "Send message failed");
     }
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
 }
 
 void handle_reject_challenge(int client_socket, char *sender_username)
 {
     char buffer[STRING_LENGTH];
 
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
 
     // ---------------------------- Remove challenge ----------------------------
     Challenge *current = challenge_list;
@@ -244,7 +244,7 @@ void handle_reject_challenge(int client_socket, char *sender_username)
                                  buffer,
                                  "ERROR This challenge has been canceled or does not exist",
                                  "Send error");
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&challenge_mutex);
         return;
     }
     // Remove challenge
@@ -260,7 +260,7 @@ void handle_reject_challenge(int client_socket, char *sender_username)
     }
     int sender_socket_id = current->sender_socket_id;
     free(current);
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
 
     // Notification to client
     send_with_error_handling(client_socket,
@@ -277,7 +277,7 @@ void handle_reject_challenge(int client_socket, char *sender_username)
 void handle_accept_challenge(int client_socket, char *sender_username)
 {
     char buffer[STRING_LENGTH];
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
     Challenge *current = challenge_list;
     Challenge *prev = NULL;
 
@@ -297,7 +297,7 @@ void handle_accept_challenge(int client_socket, char *sender_username)
     if (current == NULL)
     {
         // Challenge not existed
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&challenge_mutex);
         send_with_error_handling(client_socket,
                                  buffer,
                                  "ERROR This challenge not existed",
@@ -317,7 +317,7 @@ void handle_accept_challenge(int client_socket, char *sender_username)
         prev->next = current->next;
     }
 
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
 
     // Add users to the room
     send_to_queue(add_room(current->sender_socket_id,
@@ -350,7 +350,7 @@ void add_challenge(
 {
     if (find_challenge(sender_socket_id, receiver_socket_id) != NULL)
         return;
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
     Challenge *new_challenge = (Challenge *)malloc(sizeof(Challenge));
     new_challenge->sender_socket_id = sender_socket_id;
     new_challenge->receiver_socket_id = receiver_socket_id;
@@ -359,12 +359,12 @@ void add_challenge(
     new_challenge->next = challenge_list;
     challenge_list = new_challenge;
     printf("Add nè: %s\n", challenge_list->sender_username);
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
 }
 
 Challenge *find_challenge(int sender_socket_id, int receiver_socket_id)
 {
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
     Challenge *current = challenge_list;
 
     while (current != NULL)
@@ -373,7 +373,7 @@ Challenge *find_challenge(int sender_socket_id, int receiver_socket_id)
             (current->sender_socket_id == sender_socket_id))
         {
             // Return a pointer to the challenge if the socket_id matches
-            pthread_mutex_unlock(&mutex);
+            pthread_mutex_unlock(&challenge_mutex);
             return current;
         }
 
@@ -381,7 +381,7 @@ Challenge *find_challenge(int sender_socket_id, int receiver_socket_id)
     }
 
     // Return NULL if not found
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
     return NULL;
 }
 
@@ -411,7 +411,7 @@ void printf_room_list()
 
 void delete_challenges_by_receiver_socket_id(int socket_id)
 {
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
     Challenge *current = challenge_list;
     Challenge *prev = NULL;
     char buffer[STRING_LENGTH];
@@ -450,12 +450,12 @@ void delete_challenges_by_receiver_socket_id(int socket_id)
             current = current->next;
         }
     }
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
 }
 
 void delete_challenges_by_sender_socket_id(int socket_id)
 {
-    pthread_mutex_lock(&mutex);
+    pthread_mutex_lock(&challenge_mutex);
     Challenge *current = challenge_list;
     Challenge *prev = NULL;
 
@@ -489,5 +489,5 @@ void delete_challenges_by_sender_socket_id(int socket_id)
             current = current->next;
         }
     }
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&challenge_mutex);
 }
