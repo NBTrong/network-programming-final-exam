@@ -17,6 +17,6 @@ gcc screen.c -o screen
 ```bash
 make clean
 make
-./TCP_server/server 5500
-./TCP_client/client 127.0.0.1 5500
+./server 5500
+./client 127.0.0.1 5500
 ```
