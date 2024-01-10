@@ -22,6 +22,6 @@
  * @param client_port The port number used for the client's connection.
  * @return 0 on successful file reception, or -1 in case of an error.
  */
-int file_receiving_protocol(int sender_socket);
+void file_receiving_protocol(int sender_socket);
 
 #endif

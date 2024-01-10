@@ -101,7 +101,6 @@ void game(int sockfd)
 
   /* The game has begun. */
   printf("Game on!\n");
-  printf("Your are %c's\n", id ? 'X' : 'O');
 
   draw_board(board);
 

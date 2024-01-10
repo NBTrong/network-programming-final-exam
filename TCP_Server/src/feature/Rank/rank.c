@@ -117,7 +117,6 @@ void update_scores(const char *winner_username, const char *loser_username)
         return;
     }
 
-    char line[MAX_LINE_LENGTH];
     Player players[MAX_PLAYERS];
     int num_players = 0;
 

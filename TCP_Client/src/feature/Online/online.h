@@ -9,4 +9,4 @@ void get_list_user_online(int socket);
 
 void process_user_list(const char *userList);
 
-#endif // ARTICLE_H
+#endif

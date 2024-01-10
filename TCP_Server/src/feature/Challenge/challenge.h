@@ -50,4 +50,8 @@ void delete_challenges_by_sender_socket_id(int socket_id);
 
 void update_scores(const char *winner_username, const char *loser_username);
 
+void print_challenge_list();
+
+void printf_room_list();
+
 #endif

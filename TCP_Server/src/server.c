@@ -19,8 +19,8 @@
 
 void router(int client_socket, const char *message);
 void *handle_apis(void *arg);
-void *games_controller(void *arg);
-void init_game(void *arg);
+void *games_controller();
+void *init_game(void *arg);
 
 int main(int argc, char *argv[])
 {
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
 // ------------------- HANDLE GAME --------------------
 
-void *games_controller(void *arg)
+void *games_controller()
 {
     Message message;
 
@@ -96,11 +96,13 @@ void *games_controller(void *arg)
 
         // Create a new thread to handle the room associated with the message
         pthread_t room_thread;
-        pthread_create(&room_thread, NULL, init_game, (void *)&message.room_data);
+        pthread_create(&room_thread, NULL, &init_game, (void *)&message.room_data);
     }
+
+    return NULL;
 }
 
-void init_game(void *arg)
+void *init_game(void *arg)
 {
     Room *room = (Room *)arg;
 
@@ -125,6 +127,8 @@ void init_game(void *arg)
     in_game[room->receiver_socket_id] = 0;
     pthread_cond_broadcast(&cond);
     pthread_mutex_unlock(&socket_mutex);
+
+    return NULL;
 };
 
 // ------------------- HANDLE APIs --------------------

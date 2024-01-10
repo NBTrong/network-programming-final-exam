@@ -1,6 +1,6 @@
 #include "receiver.h"
 
-int file_receiving_protocol(int sender_socket)
+void file_receiving_protocol(int sender_socket)
 {
     char request[STRING_LENGTH];
     char response[STRING_LENGTH];
@@ -8,7 +8,7 @@ int file_receiving_protocol(int sender_socket)
     // Receive the filename and size from the client
     if (recv_with_error_handling(sender_socket, request, sizeof(request),
                                  "Error Receive filename and size failed") <= 0)
-        return 0;
+        return;
 
     // Get file name, file size
     char file_name[STRING_LENGTH];
@@ -43,7 +43,7 @@ int file_receiving_protocol(int sender_socket)
     if (file == NULL)
     {
         perror("Error opening file for writing");
-        return 0;
+        return;
     }
 
     unsigned long long int received = 0;
@@ -55,7 +55,7 @@ int file_receiving_protocol(int sender_socket)
         if (bytes_received <= 0)
         {
             perror("Error receiving data from the client");
-            return 0;
+            return;
         }
         fwrite(buffer, 1, bytes_received, file);
         received += bytes_received;
