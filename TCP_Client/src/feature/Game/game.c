@@ -95,7 +95,7 @@ void game(int sockfd)
                              buffer,
                              sizeof(buffer),
                              "Error receiving data from the client");
-    if (!strcmp(buffer, "HLD"))
+    if (!strcmp(buffer, "HOLD"))
       printf("Waiting for a second player...\n");
   } while (strcmp(buffer, "START"));
 
@@ -120,7 +120,7 @@ void game(int sockfd)
     {
       printf("That position has already been played. Try again.\n");
     }
-    else if (!strcmp(buffer, "CNT"))
+    else if (!strcmp(buffer, "COUNT"))
     {
       recv_with_error_handling(sockfd,
                                buffer,
