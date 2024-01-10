@@ -18,6 +18,16 @@
 #include "../../utils/utils.h"
 #include "../Receiver/receiver.h"
 
+/**
+ * @brief Start and manage a game between two players.
+ * 
+ * This function initiates and manages a game between two players over the specified sockets.
+ * It handles player moves, game outcomes, and logs the game details to a log file.
+ * 
+ * @param server_socket The socket of the server.
+ * 
+ * @return The game-related message received from the client.
+*/
 void game(int server_socket);
 
 #endif

@@ -18,6 +18,12 @@
  */
 void file_sending_protocol(int client_socket, char *file_path);
 
+/**
+ * Handle a message from the client.
+ * This function handles a message from the client and returns a response message.
+ * @param buffer The message from the client.
+ * @return The response message.
+ */
 char *handle_message(const char *buffer);
 
 #endif

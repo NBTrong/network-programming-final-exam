@@ -60,10 +60,11 @@ enum Code
 const char *get_code_description(enum Code code);
 
 /**
- * @brief Check the login status.
+ * @brief Check the login status for a given client socket.
  *
  * This function checks if a user is currently logged in or not by examining the `currentUser` variable.
  *
+ * @param client_socket The socket of the client.
  * @return An integer constant representing the login status (LOGGED_IN or NOT_LOGGED_IN).
  */
 int check_login_status(int client_socket);
@@ -84,6 +85,9 @@ int verify_account(const char *account);
  *
  * This function allows the user to log in by entering a username. It verifies the account and handles
  * various scenarios, including successful login, banned accounts, and non-existent accounts.
+ *
+ * @param client_socket The socket of the client.
+ * @param username The username entered by the user for login.
  */
 void login(int client_socket, const char *username);
 
@@ -92,11 +96,31 @@ void login(int client_socket, const char *username);
  *
  * This function allows the user to log out if they are currently logged in. It clears the `currentUser`
  * variable and logs the logout action.
+ *
+ * @param client_socket The socket of the client.
  */
 void logout(int client_socket);
 
+/**
+ * @brief Sign up a new user.
+ *
+ * This function allows a new user to sign up by entering a username. It verifies if the username
+ * is available and adds it to the system if it's not already taken.
+ *
+ * @param client_socket The socket of the client.
+ * @param username The username entered by the user for sign-up.
+ */
 void sign_up(int client_socket, const char *username);
 
+/**
+ * @brief Middleware for authentication.
+ *
+ * This function acts as a middleware to enforce authentication for accessing certain functionalities.
+ * It checks the login status of the client and ensures that only authenticated users can access protected features.
+ *
+ * @param client_socket The socket of the client.
+ * @return An integer constant representing the result of the authentication check.
+ */
 int auth_middleware(int client_socket);
 
 #endif

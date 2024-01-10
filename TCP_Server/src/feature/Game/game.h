@@ -25,6 +25,17 @@ typedef struct
   int current_player;
 } Game;
 
+/**
+ * @brief Start and manage a game between two players.
+ *
+ * This function initiates and manages a game between two players over the specified sockets.
+ * It handles player moves, game outcomes, and logs the game details to a log file.
+ *
+ * @param player1_socket The socket of the first player.
+ * @param player2_socket The socket of the second player.
+ * @param player1_username The username of the first player.
+ * @param player2_username The username of the second player.
+ */
 void game(int player1_socket, int player2_socket, char *player1_username, char *player2_username);
 
 #endif
