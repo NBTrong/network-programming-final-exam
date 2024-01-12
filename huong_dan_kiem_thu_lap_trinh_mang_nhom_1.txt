@@ -1,0 +1,39 @@
+Yêu cầu:
+- chạy make file
+- khởi chạy server : ./server 5500
+- khởi chạy client : ./client SERVER_IP 5500
+- trường hợp test local thì SERVER_IP thay bằng 127.0.0.1
+- Mở 4 client đăng nhập các username lần lượt “thanhtu”, “tungbt” và “admin”, “anhthu”
+- Ở client tungbt, thực hiện gửi thách đấu từ tới admin
+- Admin xem danh sách thách đấu và chấp nhận thách đấu của tungbt, dừng màn hình để test các chức năng game
+
+Mô tả test file:
+- Dòng đầu tiên là thông điệp kết nối thành công với server
+- Tiếp theo đó là lần lượt các dòng thông điệp gửi-nhận lần lượt (trường hợp đặc biệt: gửi danh sách người chơi online).
+
+Thực hiện kiểm thử lần lượt các chức năng như sau
+- khi chưa đăng nhập
+    đăng ký trùng tên
+    xem người chơi online
+    thử thách + nhập tên
+    xem danh sách thử thách
+    đăng xuất
+đăng nhập
+    đăng nhập tài khoản vô hiệu hóa
+    đăng nhập thành công
+    gửi danh sách người chơi online => trả về 4 người chơi tuy nhiên sessionID sẽ khác nhau tùy thuộc vào server
+    liệt kê danh sách thách đấu khi chưa có lời mời thách đấu
+    gửi thách đấu
+        thách đấu người lệch rank thanhtu
+        thách đấu thành công anhthu
+        hủy thách đấu anhthu thành công
+        chấp nhận thách đấu không tồn tại từ username asd
+        từ chối thách đấu không tồn tại từ username asd
+        thách đấu với người tungbt đang chơi trò chơi
+    gửi nước đi
+        gửi nước đi khi không trong trò chơi
+
+Do, để gửi được nước cờ, phải gửi lời thách đấu và chấp nhận thách đấu, mà test file sẽ chạy tuần tự từ với tốc độ nhanh nên người được nhận thách đấu dường như không thể chấp nhận thách đấu được.
+Để kiểm thử trò chơi, vui lòng thực hiện chơi thử ở client đang đăng nhập username admin và tungbt trên giao diện dòng lệnh đã khởi tạo ở trên.
+
+Trân trọng.
