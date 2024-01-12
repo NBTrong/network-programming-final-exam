@@ -1,0 +1,43 @@
+  28SUCCESS Connect successfully
+  13SIGNUP tungbt
+  20ERROR Account exited
+   8ONLINE 1
+  24ERROR Do not have access
+  19CHALLENGE SEND test
+  24ERROR Do not have access
+  14CHALLENGE LIST
+  24ERROR Do not have access
+   3BYE
+  24ERROR Do not have access
+  10USER ductq
+  20ERROR Account locked
+  13SIGNUP tungbt
+  20ERROR Account exited
+  16SIGNUP test_user
+  28SUCCESS Sign up successfully
+  14USER test_user
+  26SUCCESS Login successfully
+  10SIGNUP qwe
+  31ERROR Account already logged in
+   8USER asd
+  31ERROR Account already logged in
+   8ONLINE 1
+ 143SUCCESS NO.15(0)---test_user(you) online NO.14(0)---anhthu online NO.13(2)---admin playing NO.10(4)---tungbt playing NO.1(20)---thanhtu online 
+  19CHALLENGE SEND hehe
+  30ERROR The enemy are not online
+  22CHALLENGE SEND thanhtu
+  57ERROR The ranking difference is too big, challenge others
+  14CHALLENGE LIST
+   8SUCCESS 
+  20CHALLENGE ACCEPT asd
+  32ERROR This challenge not existed
+  20CHALLENGE REJECT asd
+  56ERROR This challenge has been canceled or does not exist
+  21CHALLENGE SEND anhthu
+  73SUCCESS Challenge sent successfully, please wait for the enemy to respond
+  23CHALLENGE CANCEL anhthu
+  32SUCCESS Cancel challenge success
+   11
+   3300
+   3BYE
+  27SUCCESS Logout successfully
